@@ -2,9 +2,12 @@
 
 3D-симулятор выживания и эволюции ластоногих. Цикл поколений, генетическое наследование, динамическая погода и кинематографичный геймплей.
 
+> **Обновлено для Unity 6 (6000.4)** с использованием новейших функций рендеринга, оптимизации и сборки.
+
 [![Build Status](https://github.com/FamousMonsterr/whitecoat-perpetual/actions/workflows/build.yml/badge.svg)](https://github.com/FamousMonsterr/whitecoat-perpetual/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Unity](https://img.shields.io/badge/Unity-2022.3%20LTS-blue.svg)](https://unity.com)
+[![Unity](https://img.shields.io/badge/Unity-6000.4%20(6%20Tech)-blue.svg)](https://unity.com)
+[![Languages](https://img.shields.io/badge/Langs-RU%20%7C%20EN%20%7C%20DE-green.svg)](Assets/Data/Loc/strings.csv)
 
 ## 🌊 Особенности
 
@@ -14,6 +17,7 @@
 - 📷 **Кинематографичная камера:** Cinemachine с подводной физикой и динамикой FOV
 - 🎵 **Адаптивный звук:** FMOD/Unity Audio Mixer реагирует на глубину и угрозу
 - 🌍 **Процедурный мир:** Чанки льда, рифов и водорослей генерируются вокруг игрока
+- 💡 **URP + Render Graph:** Биолюминесценция и продвинутые эффекты освещения в Unity 6
 - 🌐 **Локализация:** RU / EN / DE (CSV, авто-детект системы)
 - 📊 **Аналитика:** Unity Services + Crash Reporting
 - 🎮 **Steamworks:** Поддержка ачивок и статистики (требуется AppID)
@@ -52,17 +56,19 @@
 
 ### CLI Сборка (Command Line)
 
+Для автоматической сборки используйте команду (путь может отличаться в зависимости от версии):
+
 ```powershell
-& "C:\Program Files\Unity\Hub\Editor\2022.3.15f1\Editor\Unity.exe" -quit -batchmode -projectPath . -executeMethod BuildScript.PerformBuild -logFile build.log
+& "C:\Program Files\Unity\Hub\Editor\6000.4.0f1\Editor\Unity.exe" -quit -batchmode -projectPath . -executeMethod BuildScript.PerformBuild -logFile build.log
 ```
 
 ## 📦 CI/CD
 
-Проект настроен для автоматической сборки через **GitHub Actions**.
+Проект настроен для автоматической сборки через **GitHub Actions** с использованием **Unity 6 Tech**.
 
 При пуше в ветку `main`:
-1. Запускается контейнер с Unity.
-2. Собирается `.exe` версия.
+1. Запускается контейнер с Unity 6 (6000.4.0f1).
+2. Собирается `.exe` версия с поддержкой IL2CPP.
 3. Артефакт доступен во вкладке **Actions > Artifacts**.
 
 *Резервный канал:* Unity Cloud Build (настройки в `ProjectSettings/CloudBuildSettings.json`).
@@ -84,4 +90,4 @@
 
 ---
 
-© 2024 Whitecoat Game Studio. All rights reserved.
+© 2024-2025 Whitecoat Game Studio. Built with Unity 6 Tech.

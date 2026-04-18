@@ -1,4 +1,4 @@
-name: Unity Windows Build
+name: Unity Windows Build (Unity 6)
 
 on:
   push:
@@ -15,26 +15,27 @@ jobs:
           lfs: true
 
       - name: Cache Library
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: Library
-          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          key: Library-unity6-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
 
       - name: Build Unity Project
-        uses: game-ci/unity-builder@v3
+        uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: StandaloneWindows64
-          unityVersion: 2022.3.15f1
+          unityVersion: 6000.4.0f1
           buildMethod: BuildScript.PerformBuild
           versioning: Semantic
+          useCustomBuilder: false
 
       - name: Upload Build Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: WhitecoatPerpetual_Win64
+          name: WhitecoatPerpetual_Win64_Unity6
           path: Builds/Windows/
           retention-days: 7

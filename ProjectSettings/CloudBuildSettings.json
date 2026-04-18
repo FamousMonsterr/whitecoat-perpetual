@@ -1,8 +1,9 @@
 {
   "projectId": "whitecoat-perpetual-01",
+  "unityVersion": "6000.4.0f1",
   "targets": [
     {
-      "name": "Win64_Release",
+      "name": "Win64_Release_Unity6",
       "platform": "Windows64",
       "scenePaths": ["Assets/Scenes/Main.unity"],
       "buildMethod": "BuildScript.PerformBuild",
