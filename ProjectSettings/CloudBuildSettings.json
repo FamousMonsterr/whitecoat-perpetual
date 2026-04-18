@@ -1,0 +1,16 @@
+{
+  "projectId": "whitecoat-perpetual-01",
+  "targets": [
+    {
+      "name": "Win64_Release",
+      "platform": "Windows64",
+      "scenePaths": ["Assets/Scenes/Main.unity"],
+      "buildMethod": "BuildScript.PerformBuild",
+      "playerSettings": {
+        "scriptingBackend": "IL2CPP",
+        "architecture": "x86_64"
+      }
+    }
+  ],
+  "autoBuild": true
+}
