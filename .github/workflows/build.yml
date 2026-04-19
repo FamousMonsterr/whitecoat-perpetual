@@ -27,13 +27,16 @@ jobs:
         env:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          UNITY_NO_WEBGL: true
+          # Для Unity Personal: файл лицензии не нужен, если передан пустой unityLicense
+          # Экшен сам запросит активацию по email/password
         with:
           targetPlatform: StandaloneWindows64
           unityVersion: 6000.4.0f1
           buildMethod: BuildScript.PerformBuild
           versioning: Semantic
           allowDirtyBuild: true
+          unityLicense: ""  # Пустая строка триггерит авто-активацию Personal
+          skipActivation: false
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
