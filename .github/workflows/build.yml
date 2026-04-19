@@ -27,15 +27,13 @@ jobs:
         env:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          # Для Unity Personal: создайте пустой секрет UNITY_LICENSE или используйте UNITY_SERIAL=""
-          # Если сайт активации не работает, попробуйте добавить UNITY_SERIAL с вашим Personal ID
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
           targetPlatform: StandaloneWindows64
           unityVersion: 6000.4.0f1
           buildMethod: BuildScript.PerformBuild
           versioning: Semantic
           allowDirtyBuild: true
-          # unityLicense не поддерживается в v4, удаляем эту строку
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
