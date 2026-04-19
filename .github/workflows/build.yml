@@ -1,4 +1,4 @@
-name: Unity Windows Build (Unity 6)
+name: Unity Windows Build
 
 on:
   push:
@@ -18,7 +18,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: Library
-          key: Library-unity6-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          key: Library-${{ runner.os }}-unity6-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-${{ runner.os }}-unity6-
 
       - name: Build Unity Project
         uses: game-ci/unity-builder@v4
@@ -31,12 +33,11 @@ jobs:
           unityVersion: 6000.4.0f1
           buildMethod: BuildScript.PerformBuild
           versioning: Semantic
-          useCustomBuilder: false
           allowDirtyBuild: true
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: WhitecoatPerpetual_Win64_Unity6
+          name: WhitecoatPerpetual_Win64
           path: Builds/Windows/
           retention-days: 7
