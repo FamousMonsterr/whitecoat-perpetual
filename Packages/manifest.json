@@ -1,4 +1,14 @@
 {
+  "scopedRegistries": [
+    {
+      "name": "package.openupm.com",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.facepunch.steamworks",
+        "com.moonsharp.unity"
+      ]
+    }
+  ],
   "dependencies": {
     "com.facepunch.steamworks": "2.4.1",
     "com.moonsharp.unity": "2.0.0",
