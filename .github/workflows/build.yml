@@ -25,9 +25,16 @@ jobs:
       - name: Build Unity Project
         uses: game-ci/unity-builder@v4
         env:
-          # CRITICAL: Only UNITY_LICENSE is passed. No EMAIL, PASSWORD, or SERIAL.
-          # This forces the action to use the .ulf file for activation instead of online login.
+          # PERSONAL LICENSE SETUP:
+          # Ensure the following secrets are set in GitHub Settings > Secrets and Variables > Actions:
+          # 1. UNITY_LICENSE: Content of your .ulf file (Unity_lic.ulf)
+          # 2. UNITY_EMAIL: Your Unity account email (recommended for Personal licenses)
+          # 3. UNITY_PASSWORD: Your Unity account password (recommended for Personal licenses)
+          #
+          # NOTE: If you have a PRO license, remove UNITY_LICENSE and use UNITY_SERIAL instead.
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: StandaloneWindows64
           unityVersion: 6000.4.0f1
