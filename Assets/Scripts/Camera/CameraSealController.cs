@@ -11,6 +11,7 @@ public class CameraSealController : MonoBehaviour
     public float baseFOV = 45f;
 
     private CinemachineCamera vcam;
+    private CinemachineFollow follow;
 
     void Awake() {
         vcam = GetComponent<CinemachineCamera>();
@@ -20,13 +21,13 @@ public class CameraSealController : MonoBehaviour
             vcam.LookAt = followTarget;
         }
         
-        var transposer = vcam.GetCinemachineComponent<CinemachineTransposer>();
-        if (transposer != null) {
-            transposer.FollowOffset = new Vector3(0, 2.5f, -6f);
-            transposer.XDamping = baseDamping;
-            transposer.YDamping = baseDamping;
-            transposer.ZDamping = baseDamping;
-            transposer.BindingMode = CinemachineTransposer.BindingModes.SimpleFollowWithWorldUp;
+        follow = vcam.GetComponent<CinemachineFollow>();
+        if (follow != null) {
+            follow.FollowOffset = new Vector3(0, 2.5f, -6f);
+            follow.XDamping = baseDamping;
+            follow.YDamping = baseDamping;
+            follow.ZDamping = baseDamping;
+            follow.BindingMode = CinemachineFollow.BindingModes.SimpleFollowWithWorldUp;
         }
     }
 
@@ -35,14 +36,13 @@ public class CameraSealController : MonoBehaviour
         
         float depth = Mathf.Max(0, -followTarget.position.y);
         Rigidbody rb = followTarget.GetComponent<Rigidbody>();
-        float speed = rb != null ? rb.velocity.magnitude : 0f;
+        float speed = rb != null ? rb.linearVelocity.magnitude : 0f;
         
-        var transposer = vcam.GetCinemachineComponent<CinemachineTransposer>();
-        if (transposer != null) {
+        if (follow != null) {
             float damping = Mathf.Lerp(baseDamping, depthDampingMultiplier, Mathf.Clamp01(depth / 40f));
-            transposer.XDamping = damping;
-            transposer.YDamping = damping;
-            transposer.ZDamping = damping;
+            follow.XDamping = damping;
+            follow.YDamping = damping;
+            follow.ZDamping = damping;
         }
         
         float targetFOV = baseFOV + speed * speedFOVBoost;

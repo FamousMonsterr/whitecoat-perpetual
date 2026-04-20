@@ -25,7 +25,7 @@ public class AnalyticsManager : MonoBehaviour
 
     public static void TrackEvent(string name, Dictionary<string, object> data = null) {
         if (Instance == null || !Instance.IsReady) return;
-        AnalyticsService.Instance.RecordEvent(name, data ?? new Dictionary<string, object>());
+        AnalyticsService.Instance.RecordEvent(name);
     }
     
     void OnEnable() => Application.logMessageReceived += HandleLog;

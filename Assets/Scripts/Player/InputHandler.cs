@@ -65,9 +65,9 @@ public class InputHandler : MonoBehaviour
         }
         
         if (Application.isMobilePlatform) {
-            Touch.activeTouches.ForEach(t => {
-                if (t.phase == TouchPhase.Began) dodgePressed = true;
-            });
+            foreach (var t in Touch.activeTouches) {
+                if (t.phase == UnityEngine.InputSystem.TouchPhase.Began) dodgePressed = true;
+            }
         }
         
         moveInput = Vector2.ClampMagnitude(moveInput, 1f);
