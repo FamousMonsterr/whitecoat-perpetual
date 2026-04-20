@@ -18,7 +18,7 @@ public class InputHandler : MonoBehaviour
     private Vector2 moveInput;
     private float diveInput;
     private bool dodgePressed;
-    private Gyroscope gyro;
+    private UnityEngine.Gyroscope gyro;
     private bool gyroAvailable;
 
     public Vector2 MoveInput => moveInput;
