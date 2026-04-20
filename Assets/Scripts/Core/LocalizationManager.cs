@@ -30,7 +30,7 @@ public class LocalizationManager : MonoBehaviour
 
     void DetectLanguage() {
         if (PlayerPrefs.HasKey("GameLang")) {
-            Enum.TryParse(PlayerPrefs.GetString("GameLang"), out Lang saved);
+            System.Enum.TryParse(PlayerPrefs.GetString("GameLang"), out Lang saved);
             SetLanguage(saved); return;
         }
         var sys = Application.systemLanguage;
