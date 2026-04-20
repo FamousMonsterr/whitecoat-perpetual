@@ -9,20 +9,20 @@ public class WeatherVisuals : MonoBehaviour
     private WeatherSystem weather;
     private Volume volume;
     private DepthOfField dof;
-    private Fog fog;
+    private Vignette vignette;
 
     void Start() {
         weather = FindObjectOfType<WeatherSystem>();
         volume = GetComponent<Volume>();
         volume.profile.TryGet(out dof);
-        volume.profile.TryGet(out fog);
+        volume.profile.TryGet(out vignette);
         
         weather.OnStateChanged.AddListener(UpdateFX);
     }
 
     void UpdateFX(WeatherSystem.State state) {
         float vis = weather.Visibility;
-        fog.density.value = Mathf.Lerp(0.05f, 0.6f, 1f - (vis / 100f));
+        vignette.intensity.value = Mathf.Lerp(0.1f, 0.6f, 1f - (vis / 100f));
         dof.active = state == WeatherSystem.State.Storm || state == WeatherSystem.State.Blizzard;
         
         rainPS.gameObject.SetActive(state == WeatherSystem.State.Storm);

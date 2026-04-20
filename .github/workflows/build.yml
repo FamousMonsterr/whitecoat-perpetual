@@ -8,17 +8,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           lfs: true
 
-      - name: Cache Library
+      - name: Cache Library and Packages
         uses: actions/cache@v4
         with:
-          path: Library
-          key: Library-${{ runner.os }}-unity6-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          path: |
+            Library
+            Packages
+          key: Library-${{ runner.os }}-unity6-${{ hashFiles('Packages/manifest.json') }}
           restore-keys: |
             Library-${{ runner.os }}-unity6-
 
@@ -34,10 +37,11 @@ jobs:
           buildMethod: BuildScript.PerformBuild
           versioning: Semantic
           allowDirtyBuild: true
+          customParameters: -logFile -
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
           name: WhitecoatPerpetual_Win64
-          path: build/StandaloneWindows64/
+          path: Builds/Windows/
           retention-days: 7
