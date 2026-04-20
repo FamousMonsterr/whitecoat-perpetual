@@ -1,14 +1,5 @@
 {
-  "scopedRegistries": [
-    {
-      "name": "package.openupm.com",
-      "url": "https://package.openupm.com",
-      "scopes": [
-        "com.facepunch.steamworks",
-        "com.moonsharp.unity"
-      ]
-    }
-  ],
+  "scopedRegistries": [],
   "dependencies": {
     "com.unity.render-pipelines.universal": "17.0.3",
     "com.unity.cinemachine": "3.1.2",
@@ -21,8 +12,8 @@
     "com.unity.modules.physics": "1.0.0",
     "com.unity.modules.audio": "1.0.0",
     "com.unity.barracuda": "3.0.0",
-    "com.facepunch.steamworks": "2.4.1",
-    "com.moonsharp.unity": "2.0.0",
+    "com.facepunch.steamworks": "https://github.com/Facepunch/Facepunch.Steamworks.git#upm",
+    "moonsharp": "https://github.com/k0dep/MoonSharp.git",
     "com.unity.collections": "2.5.1",
     "com.unity.mathematics": "1.3.1"
   }
