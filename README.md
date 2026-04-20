@@ -20,7 +20,6 @@
 - 💡 **URP + Render Graph:** Биолюминесценция и продвинутые эффекты освещения в Unity 6
 - 🌐 **Локализация:** RU / EN / DE (CSV, авто-детект системы)
 - 📊 **Аналитика:** Unity Services + Crash Reporting
-- 🎮 **Steamworks:** Поддержка ачивок и статистики (требуется AppID)
 
 ## 🛠 Сборка (Local Build)
 
@@ -34,7 +33,6 @@
   - Input System
   - TextMeshPro
   - Unity Services (Analytics)
-  - Facepunch Steamworks (опционально)
 
 ### Шаги
 

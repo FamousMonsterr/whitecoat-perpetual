@@ -12,7 +12,6 @@
     "com.unity.modules.physics": "1.0.0",
     "com.unity.modules.audio": "1.0.0",
     "com.unity.barracuda": "3.0.0",
-    "facepunch.steamworks": "https://github.com/kamyker/Facepunch.Steamworks.Package.git",
     "moonsharp": "https://github.com/k0dep/MoonSharp.git",
     "com.unity.collections": "2.5.1",
     "com.unity.mathematics": "1.3.1"
