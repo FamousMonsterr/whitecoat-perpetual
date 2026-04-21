@@ -28,9 +28,9 @@ public class CameraSealController : MonoBehaviour
         if (thirdPersonFollow != null) {
             thirdPersonFollow.CameraDistance = 6f;
             thirdPersonFollow.VerticalOffset = 2.5f;
-            // В Cinemachine 3.x свойство BodyDamping управляет плавностью следования
-            // Документация: https://docs.unity3d.com/Packages/com.unity.cinemachine@3.1/api/Unity.Cinemachine.CinemachineThirdPersonFollow.html#Unity_Cinemachine_CinemachineThirdPersonFollow_BodyDamping
-            thirdPersonFollow.BodyDamping = new Vector3(baseDamping, baseDamping, baseDamping);
+            // В Cinemachine 3.x свойство Damping управляет плавностью следования
+            // Документация: https://docs.unity3d.com/Packages/com.unity.cinemachine@3.1/api/Unity.Cinemachine.CinemachineThirdPersonFollow.html#Unity_Cinemachine_CinemachineThirdPersonFollow_Damping
+            thirdPersonFollow.Damping = new Vector3(baseDamping, baseDamping, baseDamping);
         }
     }
 
@@ -43,8 +43,8 @@ public class CameraSealController : MonoBehaviour
         
         if (thirdPersonFollow != null) {
             float damping = Mathf.Lerp(baseDamping, depthDampingMultiplier, Mathf.Clamp01(depth / 40f));
-            // В Cinemachine 3.x свойство BodyDamping управляет плавностью следования
-            thirdPersonFollow.BodyDamping = new Vector3(damping, damping, damping);
+            // В Cinemachine 3.x свойство Damping управляет плавностью следования
+            thirdPersonFollow.Damping = new Vector3(damping, damping, damping);
         }
         
         float targetFOV = baseFOV + speed * speedFOVBoost;

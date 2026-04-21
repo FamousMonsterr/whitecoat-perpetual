@@ -22,7 +22,7 @@ public class BuildScript
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions
         {
             scenes = scenes,
-            locationPathName = "Builds/Windows/WhitecoatPerpetual.exe",
+            locationPathName = "build/StandaloneWindows64/WhitecoatPerpetual.exe",
             target = BuildTarget.StandaloneWindows64,
             targetGroup = BuildTargetGroup.Standalone,
             // В Unity 6 IL2CPP по умолчанию для Windows, но явно укажем для надежности
