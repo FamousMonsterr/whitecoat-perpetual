@@ -34,7 +34,7 @@ jobs:
         with:
           targetPlatform: StandaloneWindows64
           unityVersion: 6000.4.0f1
-          buildMethod: BuildScript.PerformBuild
+          buildMethod: BuildValidator.ForceBuild
           versioning: Semantic
           allowDirtyBuild: true
           customParameters: -logFile -
@@ -43,5 +43,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: WhitecoatPerpetual_Win64
-          path: Builds/Windows/
+          path: build/StandaloneWindows64/
           retention-days: 7
