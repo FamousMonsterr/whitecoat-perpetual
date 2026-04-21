@@ -23,7 +23,7 @@ MonoBehaviour:
       m_OverrideState: 0
       m_Value: 0
   m_AssetVersion: 1
-  m_DefaultVolumeProfile: {fileID: 11400000, guid: ab09873e2e42d4a6f9c5b1e5e5e5e5e5, type: 2}
+  m_DefaultVolumeProfile: {fileID: 11400000, guid: 6a393d16d6fe470aab53857d43c1f722, type: 2}
   m_RenderingLayerNames:
   - Default
   m_ValidRenderingLayers: 1

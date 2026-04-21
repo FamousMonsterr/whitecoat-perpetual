@@ -3,16 +3,52 @@ name: Unity Windows Build
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
+env:
+  # Принудительный переход на Node.js 24 для совместимости с GitHub Actions
+  # Документация: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  UNITY_VERSION: 6000.4.0f1
+
 jobs:
-  build:
+  test:
+    name: Test
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    # Оптимизация: включаем Node.js 24 для совместимости с будущими версиями GitHub Actions
-    # Документация: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    timeout-minutes: 15
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Library
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-test-${{ runner.os }}-${{ env.UNITY_VERSION }}-${{ hashFiles('Packages/manifest.json', 'Packages/packages-lock.json') }}
+          restore-keys: |
+            Library-test-${{ runner.os }}-${{ env.UNITY_VERSION }}-
+
+      - name: Run Unity Tests
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          testMode: all
+          checkName: Test Results
+          coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport'
+
+  build:
+    name: Build
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -25,9 +61,10 @@ jobs:
           path: |
             Library
             Packages
-          key: Library-${{ runner.os }}-unity6-${{ hashFiles('Packages/manifest.json') }}
+          key: Library-build-${{ runner.os }}-${{ env.UNITY_VERSION }}-${{ hashFiles('Packages/manifest.json', 'Packages/packages-lock.json') }}
           restore-keys: |
-            Library-${{ runner.os }}-unity6-
+            Library-build-${{ runner.os }}-${{ env.UNITY_VERSION }}-
+            Library-test-${{ runner.os }}-${{ env.UNITY_VERSION }}-
 
       - name: Build Unity Project
         uses: game-ci/unity-builder@v4
@@ -37,15 +74,28 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: StandaloneWindows64
-          unityVersion: 6000.4.0f1
+          unityVersion: ${{ env.UNITY_VERSION }}
           buildMethod: BuildValidator.ForceBuild
           versioning: Semantic
           allowDirtyBuild: true
-          customParameters: -logFile -
+          customParameters: -logFile - -buildTarget StandaloneWindows64
+          # Оптимизация: кеширование библиотек Unity между сборками
+          # Документация: https://game.ci/docs/github/builder
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: WhitecoatPerpetual_Win64
           path: build/StandaloneWindows64/
           retention-days: 7
+
+      - name: Upload Logs on Failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: BuildLogs
+          path: |
+            /github/workspace/Logs/
+            /github/workspace/BuildLogs/
+          retention-days: 3

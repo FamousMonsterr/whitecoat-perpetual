@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &1
+PackageManagerSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scopes:
+  - name: 
+    url: 
+    scopes: []
+  m_Settings: {}
+  m_RegistryUrl: 
+  m_RegistryName: 
+  m_RegistryType: 0
+  m_PackageType: 0
+  m_Registry: 
+  m_ShowPreviewPackages: 0
+  m_EnablePreviewPackages: 0
+  m_ShowBuiltInPackages: 0
+  m_ShowAssetsPackages: 1
+  m_ShowProjectPackages: 1
+  m_ShowLocalPackages: 1
+  m_ShowUpdateAvailable: 1
+  m_ShowPreRelease: 0
+  m_ShowDependencies: 0
+  m_ShowPackagePath: 0
+  m_ShowAdvanced: 0
+  m_EnablePackageManager: 1
+  m_EnablePackageManagerV2: 1
