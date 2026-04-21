@@ -11,7 +11,9 @@ public class CameraSealController : MonoBehaviour
     public float baseFOV = 45f;
 
     private CinemachineCamera vcam;
-    private CinemachineFollow follow;
+    // В Cinemachine 3.x для управления damping используется CinemachineThirdPersonFollow
+    // Документация: https://docs.unity3d.com/Packages/com.unity.cinemachine@3.1/api/Unity.Cinemachine.CinemachineThirdPersonFollow.html
+    private CinemachineThirdPersonFollow thirdPersonFollow;
 
     void Awake() {
         vcam = GetComponent<CinemachineCamera>();
@@ -21,12 +23,14 @@ public class CameraSealController : MonoBehaviour
             vcam.LookAt = followTarget;
         }
         
-        follow = vcam.GetComponent<CinemachineFollow>();
-        if (follow != null) {
-            follow.FollowOffset = new Vector3(0, 2.5f, -6f);
-            // В Cinemachine 3.x свойство BodyDamping переименовано в Damping
-            // Документация: https://docs.unity3d.com/Packages/com.unity.cinemachine@3.1/api/Unity.Cinemachine.CinemachineFollow.html
-            follow.Damping = new Vector3(baseDamping, baseDamping, baseDamping);
+        // Получаем компонент ThirdPersonFollow вместо Follow
+        thirdPersonFollow = vcam.GetComponent<CinemachineThirdPersonFollow>();
+        if (thirdPersonFollow != null) {
+            thirdPersonFollow.CameraDistance = 6f;
+            thirdPersonFollow.VerticalOffset = 2.5f;
+            // В Cinemachine 3.x свойство BodyDamping управляет плавностью следования
+            // Документация: https://docs.unity3d.com/Packages/com.unity.cinemachine@3.1/api/Unity.Cinemachine.CinemachineThirdPersonFollow.html#Unity_Cinemachine_CinemachineThirdPersonFollow_BodyDamping
+            thirdPersonFollow.BodyDamping = new Vector3(baseDamping, baseDamping, baseDamping);
         }
     }
 
@@ -37,10 +41,10 @@ public class CameraSealController : MonoBehaviour
         Rigidbody rb = followTarget.GetComponent<Rigidbody>();
         float speed = rb != null ? rb.linearVelocity.magnitude : 0f;
         
-        if (follow != null) {
+        if (thirdPersonFollow != null) {
             float damping = Mathf.Lerp(baseDamping, depthDampingMultiplier, Mathf.Clamp01(depth / 40f));
-            // В Cinemachine 3.x свойство BodyDamping переименовано в Damping
-            follow.Damping = new Vector3(damping, damping, damping);
+            // В Cinemachine 3.x свойство BodyDamping управляет плавностью следования
+            thirdPersonFollow.BodyDamping = new Vector3(damping, damping, damping);
         }
         
         float targetFOV = baseFOV + speed * speedFOVBoost;

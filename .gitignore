@@ -1,1 +1,50 @@
-Nothing should be ignored based on the provided file changes. The changes consist only of source/config files (.yml, .cs) and a markdown report file, with no build artifacts, dependencies, or temporary files that require ignoring.
+```
+# Build artifacts
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.out
+*.pdb
+*.ilk
+
+# Unity specific
+Library/
+Temp/
+Obj/
+Build/
+Logs/
+MemoryCaptures/
+*.unitypackage
+
+# Dependencies
+Packages/
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+.env.local
+.env.*
+!.env.example
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+```
