@@ -1,3 +1,40 @@
 ```
-# Configuration and workflow files only - no build artifacts to ignore
+# Unity-specific ignores
+Library/
+Temp/
+Obj/
+Build/
+*.unitypackage
+*.pidb
+*.userprefs
+*.sln
+*.csproj
+*.user
+*.userosscache
+*.unity-test-report
+
+# Compiled files
+*.dll
+*.exe
+*.pdb
+*.meta
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+.env.*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# OS generated files
+.DS_Store
+Thumbs.db
 ```

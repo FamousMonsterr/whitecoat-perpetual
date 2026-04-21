@@ -24,10 +24,7 @@ public class CameraSealController : MonoBehaviour
         follow = vcam.GetComponent<CinemachineFollow>();
         if (follow != null) {
             follow.FollowOffset = new Vector3(0, 2.5f, -6f);
-            follow.XDamping = baseDamping;
-            follow.YDamping = baseDamping;
-            follow.ZDamping = baseDamping;
-            follow.BindingMode = CinemachineFollow.BindingModes.SimpleFollowWithWorldUp;
+            follow.Damping = new Vector3(baseDamping, baseDamping, baseDamping);
         }
     }
 
@@ -40,9 +37,7 @@ public class CameraSealController : MonoBehaviour
         
         if (follow != null) {
             float damping = Mathf.Lerp(baseDamping, depthDampingMultiplier, Mathf.Clamp01(depth / 40f));
-            follow.XDamping = damping;
-            follow.YDamping = damping;
-            follow.ZDamping = damping;
+            follow.Damping = new Vector3(damping, damping, damping);
         }
         
         float targetFOV = baseFOV + speed * speedFOVBoost;
