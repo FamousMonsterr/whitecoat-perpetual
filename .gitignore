@@ -1,40 +1,27 @@
 ```
-# Unity-specific ignores
-Library/
-Temp/
-Obj/
-Build/
-*.unitypackage
-*.pidb
-*.userprefs
-*.sln
-*.csproj
-*.user
-*.userosscache
-*.unity-test-report
-
-# Compiled files
+# Build artifacts
 *.dll
 *.exe
 *.pdb
 *.meta
+*.unitypackage
 
-# Logs
-*.log
+# Unity specific
+Library/
+Temp/
+Obj/
+Build/
+Logs/
+MemoryCaptures/
+
+# Visual Studio Code
+.vscode/
 
 # Environment
 .env
 .env.local
-.env.*
+*.env.*
 
-# Editors
-.vscode/
-.idea/
-*.swp
-*.swo
-*.tmp
-
-# OS generated files
-.DS_Store
-Thumbs.db
+# Logs
+*.log
 ```

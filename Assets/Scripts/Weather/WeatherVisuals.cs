@@ -12,7 +12,7 @@ public class WeatherVisuals : MonoBehaviour
     private Vignette vignette;
 
     void Start() {
-        weather = FindFirstObjectByType<WeatherSystem>();
+        weather = FindAnyObjectByType<WeatherSystem>();
         volume = GetComponent<Volume>();
         volume.profile.TryGet(out dof);
         volume.profile.TryGet(out vignette);
