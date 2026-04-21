@@ -1,4 +1,4 @@
-**2026-04-21T19:15:06.1184101Z Current runner version: '2.333.1'
+****2026-04-21T19:15:06.1184101Z Current runner version: '2.333.1'
 2026-04-21T19:15:06.1210445Z ##[group]Runner Image Provisioner
 2026-04-21T19:15:06.1211776Z Hosted Compute Agent
 2026-04-21T19:15:06.1212865Z Version: 20260415.520
@@ -5630,4 +5630,5 @@ Packages
 2026-04-21T19:20:00.4446119Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
 2026-04-21T19:20:00.4754909Z Cleaning up orphan processes
 2026-04-21T19:20:00.5023289Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/cache@v4, actions/checkout@v4, game-ci/unity-builder@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+**
 **
