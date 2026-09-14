@@ -78,10 +78,10 @@ public class UnderwaterFX : MonoBehaviour
             if (_weather != null)
             {
                 air = Color.Lerp(air, new Color(0.78f, 0.82f, 0.88f), _weather.SnowRate);
-                RenderSettings.fogStart = Mathf.Lerp(60f, 4f, 1f - _weather.Visibility01);
-                RenderSettings.fogEnd = Mathf.Lerp(400f, 60f, 1f - _weather.Visibility01);
+                RenderSettings.fogStartDistance = Mathf.Lerp(60f, 4f, 1f - _weather.Visibility01);
+                RenderSettings.fogEndDistance = Mathf.Lerp(400f, 60f, 1f - _weather.Visibility01);
             }
-            else { RenderSettings.fogStart = 60f; RenderSettings.fogEnd = 400f; }
+            else { RenderSettings.fogStartDistance = 60f; RenderSettings.fogEndDistance = 400f; }
             RenderSettings.fogColor = air;
             if (_colorAdj != null)
             {

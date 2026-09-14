@@ -37,10 +37,21 @@ public class AnalyticsManager : MonoBehaviour
         if (Instance == null || !Instance.IsReady) return;
         try
         {
+            // Analytics 5.x API: события создаются как объекты CustomEvent и передаются в RecordEvent.
+            var evt = new CustomEvent(name);
             if (data != null)
-                AnalyticsService.Instance.CustomEvent(name, data);
-            else
-                AnalyticsService.Instance.CustomEvent(name);
+            {
+                foreach (var kv in data)
+                {
+                    // RecordEvent принимает только примитивы; всё остальное сериализуем в строку.
+                    if (kv.Value is string || kv.Value is int || kv.Value is long ||
+                        kv.Value is float || kv.Value is double || kv.Value is bool)
+                        evt.Add(kv.Key, kv.Value);
+                    else
+                        evt.Add(kv.Key, kv.Value?.ToString() ?? "null");
+                }
+            }
+            AnalyticsService.Instance.RecordEvent(evt);
         }
         catch (System.Exception) { /* тихо */ }
     }

@@ -66,8 +66,8 @@ public static class SceneBuilder
         RenderSettings.skybox = skyMat;
         RenderSettings.fog = true;
         RenderSettings.fogMode = FogMode.Linear;
-        RenderSettings.fogStart = 60f;
-        RenderSettings.fogEnd = 400f;
+        RenderSettings.fogStartDistance = 60f;
+        RenderSettings.fogEndDistance = 400f;
         RenderSettings.fogColor = new Color(0.72f, 0.80f, 0.88f);
         RenderSettings.ambientMode = UnityEngine.AmbientMode.Flat;
         RenderSettings.ambientLight = new Color(0.45f, 0.52f, 0.60f);
@@ -208,7 +208,7 @@ public static class SceneBuilder
         vcam.Priority = new PrioritySettings { Enabled = true, Value = 10 };
         var tp = vcamGo.AddComponent<CinemachineThirdPersonFollow>();
         tp.CameraDistance = 6f;
-        tp.VerticalOffset = 2.5f;
+        tp.VerticalArmLength = 2.5f;
         tp.Damping = new Vector3(0.8f, 0.8f, 0.8f);
         tp.ShoulderOffset = new Vector3(0.4f, -0.2f, 0);
         var camCtrl = vcamGo.AddComponent<CameraSealController>();

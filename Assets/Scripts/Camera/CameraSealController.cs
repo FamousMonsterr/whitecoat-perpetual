@@ -56,7 +56,7 @@ public class CameraSealController : MonoBehaviour
         if (_thirdPersonFollow != null)
         {
             _thirdPersonFollow.CameraDistance = 6f;
-            _thirdPersonFollow.VerticalOffset = 2.5f;
+            _thirdPersonFollow.VerticalArmLength = 2.5f;
             _thirdPersonFollow.Damping = new Vector3(baseDamping, baseDamping, baseDamping);
         }
         else if (_cinemachineFollow != null)
