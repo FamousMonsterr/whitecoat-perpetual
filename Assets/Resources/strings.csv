@@ -1,0 +1,45 @@
+Key,RU,EN,DE
+ui_food,Еда,Food,Nahrung
+ui_warmth,Тепло,Warmth,Wärme
+ui_oxygen,Кислород,Oxygen,Sauerstoff
+ui_stamina,Силы,Stamina,Ausdauer
+ui_health,Здоровье,Health, Gesundheit
+ui_depth,Глубина,Depth,Tiefe
+ui_generation,Поколение,Generation,Generation
+ui_stage_pup,Белёк,Pup,Robbe
+ui_stage_beater,Хоклан,Beater,Jungspund
+ui_stage_jacket,Седун,Ragged Jacket,Mauser
+ui_stage_adult,Взрослый,Adult,Erwachsen
+ui_pause,Пауза,Pause,Pause
+ui_evolution,Эволюция,Evolution,Evolution
+menu_title,Белёк: Вечный Прибой,Whitecoat: Perpetual Tide,Weißrobben: Ewige Brandung
+menu_subtitle,3D-симулятор выживания и эволюции ластоногих,3D survival and evolution sim of pinnipeds,3D-Survival- und Evolutionssim der Robben
+menu_start,Начать,Start,Starten
+menu_restart_lineage,Наследие с начала,Restart Lineage,Blutlinie neu starten
+menu_resume,Продолжить,Resume,Fortsetzen
+menu_to_main,В меню,Main Menu,Hauptmenü
+menu_quit,Выход,Quit,Beenden
+menu_next,Дальше,Continue,Weiter
+menu_reborn,Родиться заново,Be Reborn,Wiedergeboren werden
+death_title,Цикл не прерывается,The Cycle Never Ends,Der Kreis reißt nie ab
+death_orca,Тени арктики не знают жалости,The shadows of the Arctic show no mercy,Die Schatten der Arktis kennen keine Gnade
+death_drown,Лёгкие не выдержали глубины,Your lungs gave in to the deep,Die Lunge versagte in der Tiefe
+death_starve,Голод забрал очередное поколение,Hunger claimed another generation,Der Hunger holte eine weitere Generation
+death_freeze,Арктика остыла в твоём мехе,The Arctic chilled through your fur,Die Arktis fror durch dein Fell
+death_depth,Давление бездны смяло тело,The pressure of the abyss crushed you,Der Druck der Tiefe zermürbte dich
+summary_title,Новое поколение,New Generation,Neue Generation
+summary_generation,Поколение,Generation,Generation
+summary_breath,Лёгкие,Lungs,Lunge
+summary_dive,Глубина,Depth,Tiefe
+summary_warmth,Мех,Fur,Fell
+summary_speed,Хвост,Tail,Schwanzflosse
+summary_agility,Ловкость,Agility,Gewandtheit
+summary_appetite,Обмен веществ,Metabolism,Stoffwechsel
+summary_descendants,Потомков,Descendants,Nachkommen
+weather_clear,Ясно,Clear,Klar
+weather_overcast,Пасмурно,Overcast,Bedeckt
+weather_storm,Шторм,Storm,Sturm
+weather_blizzard,Пурга,Blizzard,Schneesturm
+hint_breathe,Нужен воздух — поднимись к проруби!,You need air — surface at a breathing hole!,Du brauchst Luft — tauch am Atmungsloch auf!
+hint_hunt,Голоден — охоться на рыбу,Hungry — hunt the herring,Hungrig — jage die Heringe
+hint_warm,Замёрз — отдохни на льду,Freezing — rest on the ice,Du frierst — ruh dich auf dem Eis aus
