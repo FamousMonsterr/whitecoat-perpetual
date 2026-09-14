@@ -1,91 +1,77 @@
 # 🐾 Белёк: Вечный Прибой (Whitecoat: Perpetual Tide)
 
-3D-симулятор выживания и эволюции ластоногих. Цикл поколений, генетическое наследование, динамическая погода и кинематографичный геймплей.
+3D-симулятор выживания и эволюции ластоногих. Цикл поколений, генетическое наследование,
+динамическая погода и кинематографичный геймплей.
 
-> **Обновлено для Unity 6 (6000.4)** с использованием новейших функций рендеринга, оптимизации и сборки.
+> **Unity 6 (6000.4) · URP 17 · Cinemachine 3.x · Input System** — сборка Windows / WebGL / Linux
 
-[![Build Status](https://github.com/FamousMonsterr/whitecoat-perpetual/actions/workflows/build.yml/badge.svg)](https://github.com/FamousMonsterr/whitecoat-perpetual/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Unity](https://img.shields.io/badge/Unity-6000.4%20(6%20Tech)-blue.svg)](https://unity.com)
-[![Languages](https://img.shields.io/badge/Langs-RU%20%7C%20EN%20%7C%20DE-green.svg)](Assets/Data/Loc/strings.csv)
+## 🌊 Что реализовано
 
-## 🌊 Особенности
+### Геймплей
+- 🧬 **Генетика поколений:** 6 генов (лёгкие, глубина, мех, хвост, ловкость, обмен) —
+  кроссовер + мутации между поколениями; смерть передаёт линию крови (сохранение в JSON)
+- 🐋 **Адаптивный ИИ касатки:** FSM `Patrol → Stalk → Chase → Lunge → Retreat`;
+  зрение зависит от погоды, реагирует на лай, отступает после укуса
+- 🐟 **Стайные сельди:** боиды на `Graphics.DrawMeshInstanced`, боятся белька,
+  приплывают на лай (любопытство), съедаются при контакте
+- 🌊 **Выживание:** кислород (дыхание в прорубях и на поверхности), стамина (рывки/ускорение),
+  голод, тепло (шторм/пурга/вода), давление глубины против генов `dive`
+- 🦭 **4 стадии развития:** Белёк → Хоклан → Седун → Взрослый (смена модели и масштаба)
+- 🌪 **Погода:** марковская цепь Clear/Overcast/Storm/Blizzard с плавной интерполяцией;
+  видимость влияет на ИИ хищника, шторм ломает льдины
+- 🌍 **Процедурный мир:** чанки 48 м вокруг игрока, детерминизм по сиду моря,
+  пул на каждый префаб, ледовые кольца + рифы + водоросли + криль
+- 🎵 **Аудио:** 16 синтезированных дорожек (океан, пурга, лай, зов касатки, сердцебиение при угрозе…)
+- 📷 **Камера:** Cinemachine 3.x ThirdPersonFollow, FOV от скорости, демпфирование от глубины, датч при угрозе
+- 🌃 **Сутки:** 8-минутный цикл, биолюминесценция ночью, подводный туман по глубине
+- 🌐 **Локализация:** RU / EN / DE (CSV-ассет, работает в билде)
 
-- 🧬 **Генетика:** Бонусы глубины, дыхания и терморегуляции передаются между поколениями
-- 🌪 **Погода:** Штормы, Blizzard, волны и видимость влияют на геймплей и ИИ хищников
-- 🐋 **Адаптивный ИИ:** Касатка меняет тактику от патрулирования до засад
-- 📷 **Кинематографичная камера:** Cinemachine с подводной физикой и динамикой FOV
-- 🎵 **Адаптивный звук:** FMOD/Unity Audio Mixer реагирует на глубину и угрозу
-- 🌍 **Процедурный мир:** Чанки льда, рифов и водорослей генерируются вокруг игрока
-- 💡 **URP + Render Graph:** Биолюминесценция и продвинутые эффекты освещения в Unity 6
-- 🌐 **Локализация:** RU / EN / DE (CSV, авто-детект системы)
-- 📊 **Аналитика:** Unity Services + Crash Reporting
+### Технологии 2026
+- URP 17 (Render Graph compatible), custom HLSL: `OceanWater` (Gerstner-волны, глубинный цвет, френель, пена), `ArcticSky`
+- Весь UI строится кодом (uGUI) — сцена не зависит от ручной сериализации
+- **Сцена собирается программно** (`SceneBuilder`) перед каждым билдом — детерминизм и надёжный CI
+- Ассеты сгенерированы процедурно в **Blender 4.5** (FBX для Unity, GLB для web-среза)
 
-## 🛠 Сборка (Local Build)
+## 🛠 Сборка
 
-### Требования
+### Unity Hub
+1. Клонируйте репозиторий, откройте в **Unity 6000.4.x**
+2. Меню `Whitecoat → Build Scene (Auto)` (пересоздаёт сцену из кода)
+3. Меню `Whitecoat → Build → Windows 64-bit / WebGL / Linux`
 
-- Unity Hub & **Unity 2022.3.15f1 LTS**
-- Модуль: `Windows Build Support (IL2CPP)`
-- Пакеты (Package Manager):
-  - Universal RP
-  - Cinemachine
-  - Input System
-  - TextMeshPro
-  - Unity Services (Analytics)
+### CLI / CI
+```bash
+Unity -quit -batchmode -projectPath . -executeMethod BuildValidator.ForceBuild -logFile build.log
+```
+GitHub Actions (GameCI) собирает Windows-билд при пуше в `main`.
 
-### Шаги
+## 🎮 Управление
+| Клавиша | Действие |
+|---|---|
+| WASD / стрелки | движение |
+| Q / E | всплытие / нырок |
+| Shift | ускорение (тратит силы) |
+| Space | уворот-рывок |
+| F | лай (привлекает рыбу, слышит касатка) |
+| Esc / P | пауза |
 
-1. Клонируйте репозиторий:
-   ```bash
-   git clone https://github.com/FamousMonsterr/whitecoat-perpetual.git
-   cd whitecoat-perpetual
-   ```
+Геймпад: стик — движение, триггеры — нырок, RB — ускорение, A — уворот, X — лай.
 
-2. Откройте проект в Unity Hub.
-
-3. Дождитесь импорта ассетов.
-
-4. Перейдите в `File > Build Settings`.
-
-5. Выберите платформу `Windows, Mac, Linux Standalone` -> `Windows 64-bit`.
-
-6. Нажмите `Build` и выберите папку `Builds/Windows`.
-
-### CLI Сборка (Command Line)
-
-Для автоматической сборки используйте команду (путь может отличаться в зависимости от версии):
-
-```powershell
-& "C:\Program Files\Unity\Hub\Editor\6000.4.0f1\Editor\Unity.exe" -quit -batchmode -projectPath . -executeMethod BuildScript.PerformBuild -logFile build.log
+## 📁 Структура
+```
+Assets/
+  Art/Models      FBX + анимации (Blender)
+  Art/Textures    процедурные PBR-текстуры
+  Art/Prefabs     собираются PrefabBuilder'ом
+  Audio/          16 WAV (numpy-синтез)
+  Data/Loc        strings.csv (RU/EN/DE)
+  Scripts/        Core, Player, AI, Genetics, World, Weather, VFX, UI, Audio, Editor
+  Scenes/         Main.unity (пересобирается SceneBuilder'ом)
+  Shaders/        OceanWater, ArcticSky
 ```
 
-## 📦 CI/CD
-
-Проект настроен для автоматической сборки через **GitHub Actions** с использованием **Unity 6 Tech**.
-
-При пуше в ветку `main`:
-1. Запускается контейнер с Unity 6 (6000.4.0f1).
-2. Собирается `.exe` версия с поддержкой IL2CPP.
-3. Артефакт доступен во вкладке **Actions > Artifacts**.
-
-*Резервный канал:* Unity Cloud Build (настройки в `ProjectSettings/CloudBuildSettings.json`).
-
-## 📰 Пресс-кит
-
-Материалы для прессы находятся в папке `Assets/PressKit/`:
-- Факт-лист (`FactSheet.md`)
-- Сценарий трейлера (`TrailerScript.md`)
-- Логотипы и скриншоты
-
-Контакты: `dev@whitecoat.game` | Discord: `discord.gg/whitecoat`
-
 ## 📜 Лицензия
-
-- Код: **MIT**
-- Ассеты (модели/текстуры): **CC0** (Kenney, Poly Haven)
-- Шейдеры и системы управления: Собственная разработка.
+- Код: **MIT** · Ассеты: **CC0** (сгенерированы процедурно)
 
 ---
-
-© 2024-2025 Whitecoat Game Studio. Built with Unity 6 Tech.
+© 2024-2026 Whitecoat Game Studio. Built with Unity 6 Tech.
