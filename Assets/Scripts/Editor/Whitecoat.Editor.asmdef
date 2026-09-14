@@ -2,7 +2,11 @@
     "name": "Whitecoat.Editor",
     "rootNamespace": "",
     "references": [
-        "Whitecoat.Runtime"
+        "Whitecoat.Runtime",
+        "Unity.Cinemachine",
+        "Unity.InputSystem",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.Services.Core"
     ],
     "includePlatforms": [
         "Editor"

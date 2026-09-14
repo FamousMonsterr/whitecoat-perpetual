@@ -1,7 +1,13 @@
 {
     "name": "Whitecoat.Runtime",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "Unity.Cinemachine",
+        "Unity.InputSystem",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.Services.Core",
+        "Unity.Services.Analytics"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
