@@ -20,7 +20,7 @@ public class OceanManager : MonoBehaviour
     private void Awake() { Instance = this; }
     private void OnDestroy() { if (Instance == this) Instance = null; }
 
-    private void Start() { _weather = FindFirstObjectByType<WeatherSystem>(); }
+    private void Start() { _weather = FindAnyObjectByType<WeatherSystem>(); }
 
     /// <summary>Амплитуда волн зависит от погоды.</summary>
     public float WaveAmp => waveAmpBase * Mathf.Lerp(1f, 9f, _weather != null ? _weather.Intensity : 0f);

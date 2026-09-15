@@ -18,7 +18,7 @@ public class Bioluminescence : MonoBehaviour
 
     private void Start()
     {
-        _day = FindFirstObjectByType<DayNightCycle>();
+        _day = FindAnyObjectByType<DayNightCycle>();
         _ocean = OceanManager.Instance;
         if (planktonPS != null) _emission = planktonPS.emission;
         if (glowLightA != null) { glowLightA.intensity = 0f; glowLightA.color = new Color(0.2f, 0.9f, 1f); }

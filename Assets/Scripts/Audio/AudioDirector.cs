@@ -53,8 +53,8 @@ public class AudioDirector : MonoBehaviour
     {
         _seal = SealController.Instance;
         _weather = WeatherSystem.Instance;
-        if (_weather == null) _weather = FindFirstObjectByType<WeatherSystem>();
-        _day = FindFirstObjectByType<DayNightCycle>();
+        if (_weather == null) _weather = FindAnyObjectByType<WeatherSystem>();
+        _day = FindAnyObjectByType<DayNightCycle>();
 
         if (musicSource != null) { musicSource.loop = true; musicSource.Play(); }
         if (ambientSource != null) { ambientSource.loop = true; ambientSource.Play(); }

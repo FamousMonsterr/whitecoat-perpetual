@@ -60,7 +60,7 @@ public class SealController : MonoBehaviour
         _input = InputRouter.Instance;
         _stats = GetComponent<SealStats>();
         _ocean = OceanManager.Instance;
-        _weather = FindFirstObjectByType<WeatherSystem>();
+        _weather = FindAnyObjectByType<WeatherSystem>();
         _cam = Camera.main;
     }
 

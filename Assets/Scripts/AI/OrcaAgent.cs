@@ -43,7 +43,7 @@ public class OrcaAgent : MonoBehaviour
     {
         _seal = SealController.Instance;
         if (_seal != null) _target = _seal.transform;
-        _weather = FindFirstObjectByType<WeatherSystem>();
+        _weather = FindAnyObjectByType<WeatherSystem>();
         _ocean = OceanManager.Instance;
         _homeBase = transform.position;
         NewPatrolPoint();

@@ -42,7 +42,7 @@ public class FishSchool : MonoBehaviour
         _matrices = new Matrix4x4[fishCount];
         _velocities = new Vector3[fishCount];
         _wobble = new Vector4[fishCount];
-        var rng = new System.Random(GetInstanceID());
+        var rng = new System.Random((int)GetEntityId());
         for (int i = 0; i < fishCount; i++)
         {
             _matrices[i] = Matrix4x4.TRS(_anchor + RandomInSphere(rng, schoolRadius),

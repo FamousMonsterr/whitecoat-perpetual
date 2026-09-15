@@ -25,9 +25,9 @@ public class UnderwaterFX : MonoBehaviour
     {
         _cam = Camera.main;
         _ocean = OceanManager.Instance;
-        _weather = FindFirstObjectByType<WeatherSystem>();
-        _day = FindFirstObjectByType<DayNightCycle>();
-        _volume = FindFirstObjectByType<Volume>();
+        _weather = FindAnyObjectByType<WeatherSystem>();
+        _day = FindAnyObjectByType<DayNightCycle>();
+        _volume = FindAnyObjectByType<Volume>();
         if (_volume != null)
         {
             if (_volume.profile == null)

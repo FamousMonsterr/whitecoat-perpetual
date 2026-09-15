@@ -66,7 +66,7 @@ public class SealStats : MonoBehaviour
 
     private void Start()
     {
-        _weather = FindFirstObjectByType<WeatherSystem>();
+        _weather = FindAnyObjectByType<WeatherSystem>();
         _ocean = OceanManager.Instance;
         ApplyGenes(GeneticsManager.Instance != null ? GeneticsManager.Instance.Current : GeneSet.Starter());
     }

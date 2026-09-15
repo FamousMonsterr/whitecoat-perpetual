@@ -24,7 +24,7 @@ public class WeatherVisuals : MonoBehaviour
     private void Start()
     {
         _weather = WeatherSystem.Instance;
-        if (_weather == null) _weather = FindFirstObjectByType<WeatherSystem>();
+        if (_weather == null) _weather = FindAnyObjectByType<WeatherSystem>();
         _volume = GetComponent<Volume>();
 
         if (_volume.profile == null)
