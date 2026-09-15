@@ -49,6 +49,9 @@ PlayerSettings:
   defaultScreenHeightWeb: 600
   m_StereoRenderingPath: 0
   m_ActiveColorSpace: 1
+  # Отключаем Graphics Jobs: на Radeon Vega 56 / Polaris известны зависания
+  # и розовый экран при gfx-enable-gfx-jobs=1 (boot.config генерируется отсюда)
+  m_GraphicsJobs: 0
   m_SpriteBatchMaxVertexCount: 65535
   m_SpriteBatchBatchThreshold: 256
   m_MTRendering: 1

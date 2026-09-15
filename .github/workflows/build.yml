@@ -160,9 +160,108 @@ jobs:
             /github/workspace/Logs/
           retention-days: 3
 
+  smoke-windows:
+    name: Smoke Test Windows (real launch)
+    needs: build
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - name: Download Windows Build
+        uses: actions/download-artifact@v4
+        with:
+          name: WhitecoatPerpetual_Win64
+          path: build
+
+      - name: Launch player 100s + screenshot (real D3D11 run)
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath "build\WhitecoatPerpetual.exe" -ArgumentList "-logFile","player.log","-screen-width","1280","-screen-height","720","-screen-fullscreen","0" -PassThru
+          Start-Sleep -Seconds 100
+          Add-Type -AssemblyName System.Windows.Forms
+          Add-Type -AssemblyName System.Drawing
+          $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+          $bmp = New-Object System.Drawing.Bitmap $b.Width, $b.Height
+          $g = [System.Drawing.Graphics]::FromImage($bmp)
+          $g.CopyFromScreen($b.Location, [System.Drawing.Point]::Empty, $b.Size)
+          $bmp.Save("$PWD\smoke_win.png")
+          $g.Dispose(); $bmp.Dispose()
+          Get-Process -Name "WhitecoatPerpetual" -ErrorAction SilentlyContinue | Stop-Process -Force
+          Start-Sleep -Seconds 5
+          if (Test-Path "player.log") { Get-Content "player.log" -Tail 80 | Write-Host } else { Write-Host "player.log MISSING" }
+
+      - name: Verify Player.log (smoke gate)
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "player.log")) { Write-Error "player.log missing — player never ran"; exit 1 }
+          $log = Get-Content "player.log" -Raw
+          $patterns = @("Fatal crash","D3D11: Failed to","Failed to initialize Direct3D","Shader error in","Unhandled Exception","Abort: ")
+          $hits = $patterns | Where-Object { $log.Contains($_) }
+          if ($hits) { Write-Host "CRITICAL:"; $hits | ForEach-Object { Write-Host " - $_" }; exit 1 }
+          if (-not $log.Contains("[Boot]")) { Write-Host "Game never reached boot ([Boot] log absent)"; exit 1 }
+          Write-Host "Smoke gate passed: player ran, no fatal/shader errors, boot reached"
+
+      - name: Upload smoke artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: SmokeTest_Win
+          path: |
+            player.log
+            smoke_win.png
+          retention-days: 7
+          if-no-files-found: warn
+
+  smoke-macos:
+    name: Smoke Test macOS (real launch, M1 Metal)
+    needs: build-macos
+    runs-on: macos-14
+    timeout-minutes: 15
+    steps:
+      - name: Download macOS Build
+        uses: actions/download-artifact@v4
+        with:
+          name: WhitecoatPerpetual_macOS
+          path: build
+
+      - name: Prepare app (Gatekeeper off)
+        run: |
+          APP="$(find build -maxdepth 3 -name '*.app' -print -quit)"
+          echo "APP=$APP" >> "$GITHUB_ENV"
+          xattr -cr "$APP"
+          chmod +x "$APP/Contents/MacOS/"*
+
+      - name: Launch player 100s + screenshot (real Metal on M1)
+        run: |
+          "$APP/Contents/MacOS/WhitecoatPerpetual" -logFile player.log -screen-width 1280 -screen-height 720 -screen-fullscreen 0 &
+          sleep 100
+          screencapture -x smoke_mac.png || echo "screencapture unavailable"
+          pkill -f WhitecoatPerpetual || true
+          sleep 3
+          tail -60 player.log || echo "player.log MISSING"
+
+      - name: Verify Player.log (smoke gate)
+        run: |
+          test -f player.log || { echo "player.log missing — player never ran"; exit 1; }
+          if grep -qE "Fatal crash|Shader error in|Metal: Failed to|Failed to create device|Abort:" player.log; then
+            echo "CRITICAL errors found:"; grep -nE "Fatal crash|Shader error in|Metal: Failed to|Failed to create device|Abort:" player.log; exit 1
+          fi
+          grep -q "\[Boot\]" player.log || { echo "Game never reached boot ([Boot] log absent)"; exit 1; }
+          echo "Smoke gate passed: player ran, no fatal/shader errors, boot reached"
+
+      - name: Upload smoke artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: SmokeTest_macOS
+          path: |
+            player.log
+            smoke_mac.png
+          retention-days: 7
+          if-no-files-found: warn
+
   release:
     name: Release Windows + macOS
-    needs: [ build, build-macos ]
+    needs: [ build, build-macos, smoke-windows, smoke-macos ]
     # Публикуем GitHub Release только когда коммит помечен [release]
     if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[release]') }}
     runs-on: ubuntu-latest
@@ -194,10 +293,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
         run: |
-          TAG="v0.3.0"
+          TAG="v0.3.1"
           TITLE="Белёк: Вечный Прибой — Windows 64 + macOS (Apple Silicon)"
           gh release view "$TAG" > /dev/null 2>&1 || \
-          gh release create "$TAG" --title "$TITLE" --notes "Играбельные сборки (64-bit).
+          gh release create "$TAG" --title "$TITLE" --notes "Играбельные сборки (64-bit). Реальные смоук-тесты запуска пройдены (windows-latest D3D11 + macos-14 M1 Metal).
 
           **Windows:** распакуйте WhitecoatPerpetual_Win64.zip и запустите WhitecoatPerpetual.exe.
           **macOS (Apple Silicon):** распакуйте WhitecoatPerpetual_macOS_AppleSilicon.zip и запустите WhitecoatPerpetual.app.
@@ -205,6 +304,13 @@ jobs:
 
           Управление: WASD — плавание, Shift — ускорение, Space — всплытие/прыжок,
           Ctrl — нырок, E — взаимодействие.
+
+          **v0.3.1 — фикс розового экрана/зависания на старых GPU (Radeon RX Vega 56 и т.п.):**
+          - Graphics Jobs отключены (известные зависания драйвера Vega/Polaris при gfx-jobs=1);
+          - графический API закреплён: Direct3D11 (Windows) / Metal (macOS);
+          - URP-шейдеры добавлены в Always Included Shaders, URP-ассет — во все уровни качества;
+          - при первом запуске возможна пауза 30–90 сек (компиляция шейдеров) — это нормально.
+          Если экран всё ещё розовый — обновите драйвер AMD Adrenalin и запустите с параметром \`-force-d3d11\`.
 
           Сборка: Unity 6000.5.0f1 (URP 17.5), StandaloneWindows64 + StandaloneOSX (ARM64).
           Коммит: ${{ github.sha }}" || true

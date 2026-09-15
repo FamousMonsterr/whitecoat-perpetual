@@ -28,6 +28,10 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1f;
         Application.targetFrameRate = 60;
         QualitySettings.vSyncCount = 1;
+        // Диагностика запуска: реальный GPU/API в Player.log (используется smoke-тестом CI)
+        Debug.Log($"[Boot] GPU: {SystemInfo.graphicsDeviceName} ({SystemInfo.graphicsDeviceType}), " +
+                  $"API: {SystemInfo.graphicsAPIType}, VRAM: {SystemInfo.graphicsMemorySize}MB, " +
+                  $"Unity: {Application.unityVersion}, Platform: {Application.platform}");
     }
 
     private void Start()
