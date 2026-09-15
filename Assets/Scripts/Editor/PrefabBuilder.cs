@@ -262,6 +262,7 @@ public static class PrefabBuilder
         meshGo.transform.localScale = Vector3.one * 0.5f;
         var mr = meshGo.GetComponent<MeshRenderer>();
         var mat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+        mat.enableInstancing = true; // консистентно с остальными материалами
         mat.SetColor("_BaseColor", new Color(0.7f, 0.95f, 1f, 0.8f));
         mat.SetFloat("_Smoothness", 0.7f);
         AssetDatabase.CreateAsset(mat, "Assets/Art/Materials/krill_glow.mat");

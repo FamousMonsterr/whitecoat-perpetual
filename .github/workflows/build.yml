@@ -232,20 +232,26 @@ jobs:
 
       - name: Launch player 100s + screenshot (real Metal on M1)
         run: |
-          "$APP/Contents/MacOS/WhitecoatPerpetual" -logFile player.log -screen-width 1280 -screen-height 720 -screen-fullscreen 0 &
+          # macOS: -logFile требует АБСОЛЮТНЫЙ путь (относительный молча игнорируется)
+          "$APP/Contents/MacOS/WhitecoatPerpetual" -logFile "$PWD/player_mac.log" -screen-width 1280 -screen-height 720 -screen-fullscreen 0 &
           sleep 100
           screencapture -x smoke_mac.png || echo "screencapture unavailable"
           pkill -f WhitecoatPerpetual || true
-          sleep 3
-          tail -60 player.log || echo "player.log MISSING"
+          sleep 4
+          if [ ! -f "$PWD/player_mac.log" ]; then
+            for f in "$HOME/Library/Logs/WhitecoatPerpetual/Player.log" "$HOME/Library/Logs/DefaultCompany/WhitecoatPerpetual/Player.log" "$HOME/Library/Logs/Unity/Player.log"; do
+              if [ -f "$f" ]; then echo "FALLBACK LOG: $f"; cp "$f" "$PWD/player_mac.log"; break; fi
+            done
+          fi
+          tail -60 "$PWD/player_mac.log" 2>/dev/null || echo "player.log MISSING"
 
       - name: Verify Player.log (smoke gate)
         run: |
-          test -f player.log || { echo "player.log missing — player never ran"; exit 1; }
-          if grep -qE "Fatal crash|Shader error in|Metal: Failed to|Failed to create device|Abort:" player.log; then
-            echo "CRITICAL errors found:"; grep -nE "Fatal crash|Shader error in|Metal: Failed to|Failed to create device|Abort:" player.log; exit 1
+          test -f "$PWD/player_mac.log" || { echo "player.log missing — player never ran"; exit 1; }
+          if grep -qE "Fatal crash|Shader error in|Metal: Failed to|Failed to create device|Abort:" "$PWD/player_mac.log"; then
+            echo "CRITICAL errors found:"; grep -nE "Fatal crash|Shader error in|Metal: Failed to|Failed to create device|Abort:" "$PWD/player_mac.log"; exit 1
           fi
-          grep -q "\[Boot\]" player.log || { echo "Game never reached boot ([Boot] log absent)"; exit 1; }
+          grep -q "\[Boot\]" "$PWD/player_mac.log" || { echo "Game never reached boot ([Boot] log absent)"; exit 1; }
           echo "Smoke gate passed: player ran, no fatal/shader errors, boot reached"
 
       - name: Upload smoke artifacts
@@ -254,7 +260,7 @@ jobs:
         with:
           name: SmokeTest_macOS
           path: |
-            player.log
+            player_mac.log
             smoke_mac.png
           retention-days: 7
           if-no-files-found: warn

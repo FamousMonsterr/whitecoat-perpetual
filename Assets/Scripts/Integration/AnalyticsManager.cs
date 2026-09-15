@@ -15,6 +15,13 @@ public class AnalyticsManager : MonoBehaviour
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
+        // Без linked project ID Unity Services бросает UnityProjectNotLinkedException —
+        // не инициализируемся вовсе (аналитика не критична, релиз без дашборда)
+        if (string.IsNullOrEmpty(Application.cloudProjectId))
+        {
+            Debug.Log("[Analytics] disabled: project not linked to Unity Dashboard");
+            return;
+        }
         try
         {
             await UnityServices.InitializeAsync();

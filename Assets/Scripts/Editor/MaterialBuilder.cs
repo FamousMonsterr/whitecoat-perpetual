@@ -21,6 +21,9 @@ public static class MaterialBuilder
         if (existing != null) return existing;
 
         var mat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+        // DrawMeshInstanced (рыбные школы, кристаллы) требует Enable GPU Instancing —
+        // без этого плеер сыплет InvalidOperationException и объекты не рисуются
+        mat.enableInstancing = true;
 
         var albedo = LoadTex(texName);
         if (albedo != null) mat.SetTexture("_BaseMap", albedo);
