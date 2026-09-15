@@ -282,4 +282,80 @@ public static class PrefabBuilder
 
         return SavePrefab(root, "KrillPickup");
     }
+
+    // ---------- Community (CC0) модели ----------
+    // Источники: Assets/Art/Models/Community/ATTRIBUTION.md
+    //  whale.fbx  — OGA "Whale (lowpoly)" CC0 (swim-цикл)
+    //  fish_a/b/c — Quaternius "Animated Fish" CC0 (Swim-циклы)
+
+    /// <summary>Один URP-материал на все рендереры (lowpoly без слотов).</summary>
+    private static void RetargetCommunityMaterials(GameObject root, Material mat)
+    {
+        foreach (var renderer in root.GetComponentsInChildren<Renderer>(true))
+        {
+            var mats = new Material[renderer.sharedMaterials.Length];
+            for (int i = 0; i < mats.Length; i++) mats[i] = mat;
+            renderer.sharedMaterials = mats;
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            renderer.receiveShadows = true;
+        }
+    }
+
+    /// <summary>Нормализовать длину модели по renderer bounds (модели бывают огромными).</summary>
+    private static void NormalizeVisualScale(GameObject root, float targetLength)
+    {
+        var renderers = root.GetComponentsInChildren<Renderer>();
+        if (renderers.Length == 0) return;
+        var bounds = renderers[0].bounds;
+        foreach (var r in renderers) bounds.Encapsulate(r.bounds);
+        float len = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z);
+        if (len > 0.0001f) root.transform.localScale *= targetLength / len;
+    }
+
+    /// <summary>Все клипы FBX → Animation (legacy), playAutomatically, первый — default.</summary>
+    private static void AddCommunityAnimation(string modelPath, GameObject root)
+    {
+        var anim = root.GetComponent<Animation>() ?? root.AddComponent<Animation>();
+        anim.playAutomatically = true;
+        foreach (var obj in AssetDatabase.LoadAllAssetsAtPath(modelPath))
+        {
+            if (obj is AnimationClip clip && !clip.name.StartsWith("__preview"))
+            {
+                clip.legacy = true;
+                EditorUtility.SetDirty(clip);
+                if (anim.GetClip(clip.name) == null) anim.AddClip(clip, clip.name);
+                if (anim.clip == null) anim.clip = clip;
+            }
+        }
+    }
+
+    public static GameObject BuildCommunityWhale()
+    {
+        string modelPath = $"{ModelsDir}/Community/whale.fbx";
+        ConfigureImporter(modelPath, true, null);
+        var src = AssetDatabase.LoadAssetAtPath<GameObject>(modelPath);
+        if (src == null) { Debug.LogWarning("[Prefabs] Community whale.fbx not found"); return null; }
+        var root = (GameObject)PrefabUtility.InstantiatePrefab(src);
+        root.name = "AmbientWhale";
+        // Тёмный окрас касатки (стилизованная ambient-косатка)
+        RetargetCommunityMaterials(root, MaterialCache("community_whale", null, 0.5f,
+            tint: new Color(0.13f, 0.16f, 0.21f)));
+        AddCommunityAnimation(modelPath, root);
+        NormalizeVisualScale(root, 7.5f);
+        return SavePrefab(root, "AmbientWhale");
+    }
+
+    public static GameObject BuildCommunityFish(string modelFile, string prefabName, Color tint)
+    {
+        string modelPath = $"{ModelsDir}/Community/{modelFile}";
+        ConfigureImporter(modelPath, true, null);
+        var src = AssetDatabase.LoadAssetAtPath<GameObject>(modelPath);
+        if (src == null) { Debug.LogWarning($"[Prefabs] Community {modelFile} not found"); return null; }
+        var root = (GameObject)PrefabUtility.InstantiatePrefab(src);
+        root.name = prefabName;
+        RetargetCommunityMaterials(root, MaterialCache(prefabName.ToLowerInvariant(), null, 0.4f, tint: tint));
+        AddCommunityAnimation(modelPath, root);
+        NormalizeVisualScale(root, 0.85f);
+        return SavePrefab(root, prefabName);
+    }
 }

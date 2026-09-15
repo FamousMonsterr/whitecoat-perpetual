@@ -59,6 +59,15 @@ public static class SceneBuilder
         var clam = PrefabBuilder.BuildStaticProp("clam.fbx", "Clam", true);
         var krill = PrefabBuilder.BuildKrillPickup(null);
 
+        // Community (CC0): ambient-косатка + рифовые рыбы (см. Community/ATTRIBUTION.md)
+        var whalePrefab = PrefabBuilder.BuildCommunityWhale();
+        var fishAPrefab = PrefabBuilder.BuildCommunityFish("fish_a.fbx", "ReefFishA",
+            new Color(0.55f, 0.68f, 0.80f)); // серебристо-голубая
+        var fishBPrefab = PrefabBuilder.BuildCommunityFish("fish_b.fbx", "ReefFishB",
+            new Color(0.85f, 0.55f, 0.30f)); // коралловая
+        var fishCPrefab = PrefabBuilder.BuildCommunityFish("fish_c.fbx", "ReefFishC",
+            new Color(0.88f, 0.78f, 0.42f)); // песочная
+
         // 2. Новая сцена
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
@@ -310,6 +319,57 @@ public static class SceneBuilder
             var fs = school.GetComponent<FishSchool>();
             fs.fishCount = 55;
             fs.schoolRadius = 5f;
+        }
+
+        // --- Community (CC0): ambient-косатки вдали + рифовые рыбы у кораллов ---
+        if (whalePrefab != null)
+        {
+            var whaleSpawns = new (Vector3 start, Vector3 center, float radius, float phase)[]
+            {
+                (new Vector3(-40f, -9f, -35f), new Vector3(-15f, -11f, -15f), 55f, 0.0f),
+                (new Vector3(50f, -13f, -20f), new Vector3(10f, -14f, 5f), 70f, 3.1f),
+            };
+            for (int i = 0; i < whaleSpawns.Length; i++)
+            {
+                var pivot = new GameObject("AmbientWhalePivot_" + i);
+                var whale = (GameObject)PrefabUtility.InstantiatePrefab(whalePrefab);
+                whale.transform.SetParent(pivot.transform, false);
+                whale.transform.localPosition = Vector3.zero;
+                // Исходник ориентирован вертикально (Blender Z-up): нос +Y → кладём на +Z
+                whale.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                var swim = pivot.AddComponent<AmbientSwimmer>();
+                swim.center = whaleSpawns[i].center;
+                swim.radius = whaleSpawns[i].radius;
+                swim.angularSpeed = 0.05f;
+                swim.phase = whaleSpawns[i].phase;
+                swim.bobAmp = 1.2f;
+                pivot.transform.position = whaleSpawns[i].start;
+            }
+            Debug.Log("[SceneBuilder] Ambient whales: " + whaleSpawns.Length);
+        }
+
+        var reefFishPrefabs = new[] { fishAPrefab, fishBPrefab, fishCPrefab };
+        for (int g = 0; g < reefFishPrefabs.Length; g++)
+        {
+            if (reefFishPrefabs[g] == null) continue;
+            for (int j = 0; j < 7; j++)
+            {
+                var pivot = new GameObject("ReefFish_" + g + "_" + j);
+                var fish = (GameObject)PrefabUtility.InstantiatePrefab(reefFishPrefabs[g]);
+                fish.transform.SetParent(pivot.transform, false);
+                fish.transform.localPosition = Vector3.zero;
+                var center = schoolPos[g]
+                             + new Vector3(Mathf.Cos(g * 2.1f + j) * 3.5f, 1.5f + 0.4f * j,
+                                           Mathf.Sin(g * 2.1f + j) * 3.5f);
+                var swim = pivot.AddComponent<AmbientSwimmer>();
+                swim.center = center;
+                swim.radius = 1.2f + 0.25f * j;
+                swim.angularSpeed = 0.7f + 0.09f * j;
+                swim.phase = g * 0.9f + j * 0.45f;
+                swim.bobAmp = 0.12f;
+                pivot.transform.position = center;
+            }
+            Debug.Log($"[SceneBuilder] Reef fish group {g}: 7");
         }
 
         // --- UI ---
