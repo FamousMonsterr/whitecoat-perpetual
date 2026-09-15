@@ -123,10 +123,10 @@ public static class PrefabBuilder
 
         RetargetMaterials(root);
 
-        // Animation-компонент
+        // Animation-компонент (Unity 6 ModelImporter уже добавляет Animation на корень FBX)
         if (clips != null && clips.Length > 0)
         {
-            var anim = root.AddComponent<Animation>();
+            var anim = root.GetComponent<Animation>() ?? root.AddComponent<Animation>();
             anim.playAutomatically = true;
             foreach (var clipName in clips)
             {
@@ -166,7 +166,7 @@ public static class PrefabBuilder
 
         RetargetMaterials(root);
 
-        var anim = root.AddComponent<Animation>();
+        var anim = root.GetComponent<Animation>() ?? root.AddComponent<Animation>(); // уже есть от импортёра
         anim.playAutomatically = true;
         foreach (var clipName in new[] { "OrcaCruise", "OrcaChase", "OrcaLunge" })
         {
