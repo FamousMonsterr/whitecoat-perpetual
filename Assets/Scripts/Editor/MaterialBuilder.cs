@@ -120,10 +120,31 @@ public static class MaterialBuilder
         var path = $"{OutDir}/sky.mat";
         var existing = AssetDatabase.LoadAssetAtPath<Material>(path);
         if (existing != null) return existing;
+
+        // CC0 HDRI (Poly Haven, snow_field_puresky) — реалистичное арктическое небо
+        var hdriTex = AssetDatabase.LoadAssetAtPath<Texture>("Assets/Art/Environment/sky_hdr.hdr");
+        if (hdriTex != null)
+        {
+            var pano = Shader.Find("Skybox/Panoramic");
+            if (pano != null)
+            {
+                var mat = new Material(pano);
+                mat.SetTexture("_MainTex", hdriTex);
+                mat.SetFloat("_Mapping", 1f);      // Latitude-Longitude
+                mat.SetFloat("_ImageType", 0f);    // 360
+                mat.SetFloat("_Exposure", 1.05f);
+                mat.SetFloat("_Rotation", 12f);
+                Debug.Log("[Materials] Sky: Poly Haven HDRI (snow_field_puresky, CC0)");
+                AssetDatabase.CreateAsset(mat, path);
+                return mat;
+            }
+        }
+
         var shader = Shader.Find("Whitecoat/ArcticSky");
         if (shader == null) { Debug.LogError("[Materials] ArcticSky shader missing"); return null; }
-        var mat = new Material(shader);
-        AssetDatabase.CreateAsset(mat, path);
-        return mat;
+        var fallback = new Material(shader);
+        Debug.LogWarning("[Materials] Sky: HDRI не найден — fallback ArcticSky");
+        AssetDatabase.CreateAsset(fallback, path);
+        return fallback;
     }
 }

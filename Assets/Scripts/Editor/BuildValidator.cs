@@ -5,15 +5,20 @@ using UnityEngine.Rendering;
 
 /// <summary>
 /// Точка входа CI/CD (Game CI / Unity Builder): BuildValidator.ForceBuild.
-/// Пересобирает сцену программно, затем билдит Windows-таргет.
+/// Пересобирает сцену программно, затем билдит таргет из -buildTarget
+/// (StandaloneWindows64 → .exe, StandaloneOSX → .app / Apple Silicon).
 /// </summary>
 public static class BuildValidator
 {
-    private const string OutputPath = "build/StandaloneWindows64/WhitecoatPerpetual.exe";
-
     public static void ForceBuild()
     {
         Debug.Log("[BuildValidator] Starting forced build sequence...");
+
+        // 0. Таргет из CLI (-buildTarget)
+        var target = EditorUserBuildSettings.activeBuildTarget;
+        string output = target == BuildTarget.StandaloneOSX
+            ? "build/StandaloneOSX/WhitecoatPerpetual.app"
+            : "build/StandaloneWindows64/WhitecoatPerpetual.exe";
 
         // 1. Программная пересборка сцены (детерминированная)
         SceneBuilder.EnsureBuilt(force: true);
@@ -30,13 +35,13 @@ public static class BuildValidator
         var options = new BuildPlayerOptions
         {
             scenes = new[] { "Assets/Scenes/Main.unity" },
-            locationPathName = OutputPath,
-            target = BuildTarget.StandaloneWindows64,
+            locationPathName = output,
+            target = target,
             targetGroup = BuildTargetGroup.Standalone,
             options = BuildOptions.None
         };
 
-        Debug.Log("[BuildValidator] Building Windows64...");
+        Debug.Log($"[BuildValidator] Building {target} -> {output} ...");
         BuildReport report = BuildPipeline.BuildPlayer(options);
 
         if (report.summary.result == BuildResult.Succeeded)

@@ -1,4 +1,4 @@
-name: Unity Windows Build
+name: Unity Windows + macOS Build
 
 on:
   push:
@@ -51,7 +51,7 @@ jobs:
           coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport'
 
   build:
-    name: Build
+    name: Build Windows 64
     needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -67,12 +67,12 @@ jobs:
           path: |
             Library
             Packages
-          key: Library-build-${{ runner.os }}-${{ env.UNITY_VERSION }}-${{ hashFiles('Packages/manifest.json', 'Packages/packages-lock.json') }}
+          key: Library-win-${{ runner.os }}-${{ env.UNITY_VERSION }}-${{ hashFiles('Packages/manifest.json', 'Packages/packages-lock.json') }}
           restore-keys: |
-            Library-build-${{ runner.os }}-${{ env.UNITY_VERSION }}-
+            Library-win-${{ runner.os }}-${{ env.UNITY_VERSION }}-
             Library-test-${{ runner.os }}-${{ env.UNITY_VERSION }}-
 
-      - name: Build Unity Project
+      - name: Build Unity Project (StandaloneWindows64)
         uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -85,10 +85,8 @@ jobs:
           versioning: Semantic
           allowDirtyBuild: true
           customParameters: -logFile - -buildTarget StandaloneWindows64
-          # Оптимизация: кеширование библиотек Unity между сборками
-          # Документация: https://game.ci/docs/github/builder
 
-      - name: Upload Build Artifact
+      - name: Upload Build Artifact (Windows)
         uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -100,50 +98,112 @@ jobs:
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: BuildLogs
+          name: BuildLogs_Win
           path: |
             /github/workspace/Logs/
-            /github/workspace/BuildLogs/
+          retention-days: 3
+
+  build-macos:
+    name: Build macOS (Apple Silicon)
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Library and Packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            Library
+            Packages
+          key: Library-osx-${{ runner.os }}-${{ env.UNITY_VERSION }}-${{ hashFiles('Packages/manifest.json', 'Packages/packages-lock.json') }}
+          restore-keys: |
+            Library-osx-${{ runner.os }}-${{ env.UNITY_VERSION }}-
+            Library-test-${{ runner.os }}-${{ env.UNITY_VERSION }}-
+
+      - name: Build Unity Project (StandaloneOSX)
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: StandaloneOSX
+          unityVersion: ${{ env.UNITY_VERSION }}
+          buildMethod: BuildValidator.ForceBuild
+          versioning: Semantic
+          allowDirtyBuild: true
+          customParameters: -logFile - -buildTarget StandaloneOSX
+
+      - name: Upload Build Artifact (macOS)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: WhitecoatPerpetual_macOS
+          path: build/StandaloneOSX/
+          retention-days: 7
+
+      - name: Upload Logs on Failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: BuildLogs_macOS
+          path: |
+            /github/workspace/Logs/
           retention-days: 3
 
   release:
-    name: Release Windows
-    needs: build
+    name: Release Windows + macOS
+    needs: [ build, build-macos ]
     # Публикуем GitHub Release только когда коммит помечен [release]
     if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[release]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    permissions:
-      contents: write
     steps:
-      - name: Download Build Artifact
+      - name: Download Windows Artifact
         uses: actions/download-artifact@v4
         with:
           name: WhitecoatPerpetual_Win64
           path: build/StandaloneWindows64/
 
-      - name: Zip Build (portable exe)
+      - name: Download macOS Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: WhitecoatPerpetual_macOS
+          path: build/StandaloneOSX/
+
+      - name: Zip Builds
         run: |
           cd build/StandaloneWindows64
           zip -qr "${{ github.workspace }}/WhitecoatPerpetual_Win64.zip" .
+          cd "${{ github.workspace }}/build/StandaloneOSX"
+          zip -qry "${{ github.workspace }}/WhitecoatPerpetual_macOS_AppleSilicon.zip" .
           cd "${{ github.workspace }}"
-          ls -la WhitecoatPerpetual_Win64.zip
+          ls -la *.zip
 
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="v0.2.0-win64"
-          TITLE="Белёк: Вечный Прибой — Windows 64-bit"
-          NOTES="Играбельная Windows-сборка (64-bit).
+          TAG="v0.3.0"
+          TITLE="Белёк: Вечный Прибой — Windows 64 + macOS (Apple Silicon)"
+          gh release view "$TAG" > /dev/null 2>&1 || \
+          gh release create "$TAG" --title "$TITLE" --notes "Играбельные сборки (64-bit).
 
-          **Запуск:** распакуйте архив и запустите \`WhitecoatPerpetual.exe\`.
+          **Windows:** распакуйте WhitecoatPerpetual_Win64.zip и запустите WhitecoatPerpetual.exe.
+          **macOS (Apple Silicon):** распакуйте WhitecoatPerpetual_macOS_AppleSilicon.zip и запустите WhitecoatPerpetual.app.
+          Сборка не подписана: первый запуск через правый клик → «Открыть» (или \`xattr -cr WhitecoatPerpetual.app\`).
 
           Управление: WASD — плавание, Shift — ускорение, Space — всплытие/прыжок,
           Ctrl — нырок, E — взаимодействие.
 
-          Сборка: Unity 6000.5.0f1 (URP 17.5), IL2CPP, StandaloneWindows64.
+          Сборка: Unity 6000.5.0f1 (URP 17.5), StandaloneWindows64 + StandaloneOSX (ARM64).
           Коммит: ${{ github.sha }}"
-          gh release create "$TAG" --title "$TITLE" --notes "$NOTES" --clobber || true
-          gh release upload "$TAG" "WhitecoatPerpetual_Win64.zip" --clobber
+          gh release upload "$TAG" \
+            "WhitecoatPerpetual_Win64.zip" \
+            "WhitecoatPerpetual_macOS_AppleSilicon.zip" --clobber
           echo "Release ready: https://github.com/${{ github.repository }}/releases/tag/$TAG"
