@@ -51,7 +51,9 @@ public static class PrefabBuilder
     {
         var importer = AssetImporter.GetAtPath(modelPath) as ModelImporter;
         if (importer == null) return;
-        importer.materialLocation = ModelImporterMaterialLocation.BuiltIn;
+        // Unity 6: enum BuiltIn удалён — ImportViaMaterialDescription импортирует материалы
+        // из FBX с именами слотов, RetargetMaterials затем подменяет их на наши URP-материалы.
+        importer.materialLocation = ModelImporterMaterialLocation.ImportViaMaterialDescription;
 
         if (withLegacyClips)
         {
@@ -60,7 +62,8 @@ public static class PrefabBuilder
             {
                 string n = clips[i].name;
                 bool once = n.Contains("Lunge") || n.Contains("Bark") || n.Contains("Eat");
-                clips[i].legacy = true;
+                // Unity 6: ModelImporterClipAnimation.legacy удалён — легаси-флаг ставится
+                // напрямую на AnimationClip (см. BuildSeal/BuildOrca: clip.legacy = true).
                 clips[i].loopTime = !once;
             }
             importer.clipAnimations = clips;

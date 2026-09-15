@@ -11,7 +11,9 @@ env:
   # Принудительный переход на Node.js 24 для совместимости с GitHub Actions
   # Документация: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  UNITY_VERSION: 6000.4.0f1
+  # Unity 6000.5.0f1: обход известного бага ShaderGraph 17.4 (CS0246 GUID) из 6000.4 —
+  # исправлен только в 6000.5.0a3+. URP/ShaderGraph закреплены на 17.5.0.
+  UNITY_VERSION: 6000.5.0f1
 
 jobs:
   test:
@@ -99,3 +101,45 @@ jobs:
             /github/workspace/Logs/
             /github/workspace/BuildLogs/
           retention-days: 3
+
+  release:
+    name: Release Windows
+    needs: build
+    # Публикуем GitHub Release только когда коммит помечен [release]
+    if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[release]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: WhitecoatPerpetual_Win64
+          path: build/StandaloneWindows64/
+
+      - name: Zip Build (portable exe)
+        run: |
+          cd build/StandaloneWindows64
+          zip -qr "${{ github.workspace }}/WhitecoatPerpetual_Win64.zip" .
+          cd "${{ github.workspace }}"
+          ls -la WhitecoatPerpetual_Win64.zip
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="v0.2.0-win64"
+          TITLE="Белёк: Вечный Прибой — Windows 64-bit"
+          NOTES="Играбельная Windows-сборка (64-bit).
+
+          **Запуск:** распакуйте архив и запустите \`WhitecoatPerpetual.exe\`.
+
+          Управление: WASD — плавание, Shift — ускорение, Space — всплытие/прыжок,
+          Ctrl — нырок, E — взаимодействие.
+
+          Сборка: Unity 6000.5.0f1 (URP 17.5), IL2CPP, StandaloneWindows64.
+          Коммит: ${{ github.sha }}"
+          gh release create "$TAG" --title "$TITLE" --notes "$NOTES" --clobber || true
+          gh release upload "$TAG" "WhitecoatPerpetual_Win64.zip" --clobber
+          echo "Release ready: https://github.com/${{ github.repository }}/releases/tag/$TAG"

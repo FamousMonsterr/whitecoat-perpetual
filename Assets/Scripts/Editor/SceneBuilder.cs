@@ -69,7 +69,7 @@ public static class SceneBuilder
         RenderSettings.fogStartDistance = 60f;
         RenderSettings.fogEndDistance = 400f;
         RenderSettings.fogColor = new Color(0.72f, 0.80f, 0.88f);
-        RenderSettings.ambientMode = UnityEngine.AmbientMode.Flat;
+        RenderSettings.ambientMode = AmbientMode.Flat; // UnityEngine.Rendering.AmbientMode (Unity 6)
         RenderSettings.ambientLight = new Color(0.45f, 0.52f, 0.60f);
 
         // --- Системы ---

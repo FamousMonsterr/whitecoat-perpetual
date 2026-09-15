@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 /// <summary>
 /// Точка входа CI/CD (Game CI / Unity Builder): BuildValidator.ForceBuild.
@@ -63,7 +64,7 @@ public static class BuildValidator
 
     private static void ValidateURPSettings()
     {
-        var urpAsset = GraphicsSettings.defaultRenderPipeline;
+        var urpAsset = GraphicsSettings.defaultRenderPipeline; // UnityEngine.Rendering.GraphicsSettings (Unity 6)
         if (urpAsset == null)
         {
             Debug.LogWarning("[BuildValidator] URP Asset not assigned! Build may fail at runtime.");
