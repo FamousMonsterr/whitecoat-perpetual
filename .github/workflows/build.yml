@@ -43,7 +43,6 @@ jobs:
         with:
           unityVersion: ${{ env.UNITY_VERSION }}
           testMode: EditMode
-          cliVersion: 0.1.65
           checkName: Test Results
           coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport'
 
