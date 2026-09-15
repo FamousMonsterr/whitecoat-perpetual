@@ -25,7 +25,7 @@ public static class PrefabBuilder
             case "seal_eye": return MaterialCache("seal_eye", "tex_eye", 0.06f, smooth: "tex_eye_r");
             case "orca_skin": return MaterialCache("orca_skin", "tex_orca", 0.6f, "tex_orca_n", smooth: "tex_orca_r");
             case "fish_skin": return MaterialCache("fish_skin", "tex_fish", 0.35f, null, 0.25f, smooth: "tex_fish_r");
-            case "snow": return MaterialCache("snow", "tex_snow", 0.92f, "tex_noise_n", smooth: "tex_snow_r");
+            case "snow": return MaterialCache("snow", "tex_snow", 0.92f, "tex_snow_n", smooth: "tex_snow_r");
             case "ice": return MaterialCache("ice", "tex_ice", 0.4f, "tex_ice_n", smooth: "tex_ice_r");
             case "rock": case "clam": return MaterialCache("rock", "tex_rock", 0.9f, "tex_noise_n", smooth: "tex_rock_r");
             case "kelp": return MaterialCache("kelp", "tex_kelp", 0.75f, null, 0f, true);
