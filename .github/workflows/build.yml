@@ -7,6 +7,10 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  checks: write      # test-runner публикует чек "Test Results"
+  contents: write    # release-job создаёт Release
+
 env:
   # Принудительный переход на Node.js 24 для совместимости с GitHub Actions
   # Документация: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
