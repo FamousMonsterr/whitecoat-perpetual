@@ -2,6 +2,7 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!129 &1
 PlayerSettings:
+  activeInputHandler: 2
   m_ObjectHideFlags: 0
   serializedVersion: 28
   productGUID: 5d34f2f94f9c4f2e8a7b6c5d4e3f2a1b

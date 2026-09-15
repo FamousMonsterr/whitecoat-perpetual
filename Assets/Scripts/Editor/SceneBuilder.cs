@@ -160,19 +160,13 @@ public static class SceneBuilder
         adultModel.transform.localPosition = Vector3.zero;
         adultModel.SetActive(false);
 
-        // Все дети FBX (риг+меш) переносим в обёртку PupVisual — переключение стадий надёжно
-        var pupWrapper = new GameObject("PupVisual");
-        pupWrapper.transform.SetParent(player.transform, false);
-        int childCount = player.transform.childCount;
-        for (int i = childCount - 1; i >= 0; i--)
-        {
-            var child = player.transform.GetChild(i);
-            if (child.name == "AdultVisual") continue;
-            child.SetParent(pupWrapper.transform, true);
-        }
+        // Unity 6: переносить ДЕТЕЙ префаб-инстанса нельзя ("Setting the parent ... is not possible").
+        // Визуал белька = арматурная ветка "SealRig" внутри инстанса — её и переключаем по стадиям.
+        var pupRig = player.transform.Find("SealRig");
+        var pupVisualGo = pupRig != null ? pupRig.gameObject : player;
 
         var stage = player.AddComponent<SealStageSystem>();
-        stage.pupVisual = pupWrapper;
+        stage.pupVisual = pupVisualGo;
         stage.adultVisual = adultModel;
 
         // Точка головы
