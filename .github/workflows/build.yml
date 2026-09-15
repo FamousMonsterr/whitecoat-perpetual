@@ -3,6 +3,9 @@ name: Unity Windows + macOS Build
 on:
   push:
     branches: [ main ]
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
   pull_request:
     branches: [ main ]
   workflow_dispatch:
@@ -202,7 +205,8 @@ jobs:
           Ctrl — нырок, E — взаимодействие.
 
           Сборка: Unity 6000.5.0f1 (URP 17.5), StandaloneWindows64 + StandaloneOSX (ARM64).
-          Коммит: ${{ github.sha }}"
+          Коммит: ${{ github.sha }}" || true
+          gh release view "$TAG" > /dev/null 2>&1 || gh release create "$TAG" --generate-notes || true
           gh release upload "$TAG" \
             "WhitecoatPerpetual_Win64.zip" \
             "WhitecoatPerpetual_macOS_AppleSilicon.zip" --clobber
