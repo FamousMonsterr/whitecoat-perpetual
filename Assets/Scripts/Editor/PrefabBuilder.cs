@@ -54,7 +54,7 @@ public static class PrefabBuilder
         if (importer == null) return;
         // Unity 6: enum BuiltIn удалён — ImportViaMaterialDescription импортирует материалы
         // из FBX с именами слотов, RetargetMaterials затем подменяет их на наши URP-материалы.
-        importer.materialLocation = ModelImporterMaterialLocation.ImportViaMaterialDescription;
+        importer.materialLocation = ModelImporterMaterialLocation.InPrefab; // Unity 6.4+: встроенные материалы FBX
 
         if (withLegacyClips)
         {
