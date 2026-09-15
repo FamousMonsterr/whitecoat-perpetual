@@ -126,7 +126,8 @@ public static class PrefabBuilder
         // Animation-компонент (Unity 6 ModelImporter уже добавляет Animation на корень FBX)
         if (clips != null && clips.Length > 0)
         {
-            var anim = root.GetComponent<Animation>() ?? root.AddComponent<Animation>();
+            var anim = root.GetComponent<Animation>();
+            if (anim == null) anim = root.AddComponent<Animation>(); // fake-null-safe (не ??)
             anim.playAutomatically = true;
             foreach (var clipName in clips)
             {
@@ -166,7 +167,8 @@ public static class PrefabBuilder
 
         RetargetMaterials(root);
 
-        var anim = root.GetComponent<Animation>() ?? root.AddComponent<Animation>(); // уже есть от импортёра
+        var anim = root.GetComponent<Animation>();
+        if (anim == null) anim = root.AddComponent<Animation>(); // уже есть от импортёра; fake-null-safe (не ??)
         anim.playAutomatically = true;
         foreach (var clipName in new[] { "OrcaCruise", "OrcaChase", "OrcaLunge" })
         {
@@ -312,21 +314,30 @@ public static class PrefabBuilder
         if (len > 0.0001f) root.transform.localScale *= targetLength / len;
     }
 
-    /// <summary>Все клипы FBX → Animation (legacy), playAutomatically, первый — default.</summary>
+    /// <summary>Все клипы FBX → Animation (legacy), playAutomatically, первый — default.
+    /// ВАЖНО: не использовать `??` для Unity-объектов — GetComponent может вернуть
+    /// fake-null обёртку после реимпорта (MissingComponentException). Только == null.</summary>
     private static void AddCommunityAnimation(string modelPath, GameObject root)
     {
-        var anim = root.GetComponent<Animation>() ?? root.AddComponent<Animation>();
+        var anim = root.GetComponent<Animation>();
+        if (anim == null) anim = root.AddComponent<Animation>();
+        if (anim == null) { Debug.LogWarning($"[Prefabs] No Animation component on {root.name}"); return; }
         anim.playAutomatically = true;
+        AnimationClip best = null, first = null;
         foreach (var obj in AssetDatabase.LoadAllAssetsAtPath(modelPath))
         {
             if (obj is AnimationClip clip && !clip.name.StartsWith("__preview"))
             {
+                if (clip.length < 0.01f) continue; // вырожденные клипы (PointAction.008)
                 clip.legacy = true;
                 EditorUtility.SetDirty(clip);
                 if (anim.GetClip(clip.name) == null) anim.AddClip(clip, clip.name);
-                if (anim.clip == null) anim.clip = clip;
+                if (first == null) first = clip;
+                if (best == null && clip.name.ToLowerInvariant().Contains("swim")) best = clip;
             }
         }
+        if (anim.clip == null && best != null) anim.clip = best;
+        if (anim.clip == null && first != null) anim.clip = first;
     }
 
     public static GameObject BuildCommunityWhale()
