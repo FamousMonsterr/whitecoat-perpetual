@@ -18,18 +18,19 @@ public static class PrefabBuilder
     {
         switch (slotName)
         {
-            case "seal_fur": return MaterialCache("seal_fur", "tex_fur_white", 0.85f, "tex_fur_n");
-            case "seal_fur_adult": return MaterialCache("seal_fur_adult", "tex_fur_gray", 0.85f, "tex_fur_n");
+            case "seal_fur": return MaterialCache("seal_fur", "tex_fur_white", 0.85f, "tex_fur_n", smooth: "tex_fur_white_r");
+            case "seal_fur_adult": return MaterialCache("seal_fur_adult", "tex_fur_gray", 0.85f, "tex_fur_n", smooth: "tex_fur_gray_r");
             case "seal_dark": return MaterialCache("seal_dark", null, 0.35f, null, 0f, true,
                     new Color(0.02f, 0.02f, 0.025f));
-            case "orca_skin": return MaterialCache("orca_skin", "tex_orca", 0.6f);
-            case "fish_skin": return MaterialCache("fish_skin", "tex_fish", 0.35f, null, 0.25f);
-            case "snow": return MaterialCache("snow", "tex_snow", 0.92f, "tex_noise_n");
-            case "ice": return MaterialCache("ice", "tex_ice", 0.4f, "tex_noise_n");
-            case "rock": case "clam": return MaterialCache("rock", "tex_rock", 0.9f, "tex_noise_n");
+            case "seal_eye": return MaterialCache("seal_eye", "tex_eye", 0.06f, smooth: "tex_eye_r");
+            case "orca_skin": return MaterialCache("orca_skin", "tex_orca", 0.6f, "tex_orca_n", smooth: "tex_orca_r");
+            case "fish_skin": return MaterialCache("fish_skin", "tex_fish", 0.35f, null, 0.25f, smooth: "tex_fish_r");
+            case "snow": return MaterialCache("snow", "tex_snow", 0.92f, "tex_noise_n", smooth: "tex_snow_r");
+            case "ice": return MaterialCache("ice", "tex_ice", 0.4f, "tex_ice_n", smooth: "tex_ice_r");
+            case "rock": case "clam": return MaterialCache("rock", "tex_rock", 0.9f, "tex_noise_n", smooth: "tex_rock_r");
             case "kelp": return MaterialCache("kelp", "tex_kelp", 0.75f, null, 0f, true);
             case "coral": return MaterialCache("coral", "tex_coral", 0.8f);
-            case "sand": return MaterialCache("sand", "tex_sand", 0.95f, "tex_noise_n");
+            case "sand": return MaterialCache("sand", "tex_sand", 0.95f, "tex_noise_n", smooth: "tex_sand_r");
             default: return MaterialCache("fallback", "tex_rock", 0.8f);
         }
     }
@@ -37,10 +38,10 @@ public static class PrefabBuilder
     private static readonly System.Collections.Generic.Dictionary<string, Material> _cache = new();
 
     private static Material MaterialCache(string key, string tex, float rough, string normal = null,
-        float metal = 0f, bool dark = false, Color? tint = null)
+        float metal = 0f, bool dark = false, Color? tint = null, string smooth = null)
     {
         if (_cache.TryGetValue(key, out var m)) return m;
-        m = MaterialBuilder.Build(key, tex, rough, normal, metal, false, tint);
+        m = MaterialBuilder.Build(key, tex, rough, normal, metal, false, tint, smooth);
         _cache[key] = m;
         return m;
     }

@@ -13,7 +13,7 @@ public static class MaterialBuilder
     private const string OutDir = "Assets/Art/Materials";
 
     public static Material Build(string name, string texName, float roughness, string normalTex = null,
-        float metallic = 0f, bool transparent = false, Color? baseTint = null)
+        float metallic = 0f, bool transparent = false, Color? baseTint = null, string smoothTex = null)
     {
         Directory.CreateDirectory(OutDir);
         var path = $"{OutDir}/{name}.mat";
@@ -27,6 +27,20 @@ public static class MaterialBuilder
         if (baseTint.HasValue) mat.SetColor("_BaseColor", baseTint.Value);
         mat.SetFloat("_Smoothness", 1f - roughness);
         mat.SetFloat("_Metallic", metallic);
+
+        // Карта гладкости (блики): R=metallic(0), A=smoothness — линейное пространство
+        if (!string.IsNullOrEmpty(smoothTex))
+        {
+            var sm = LoadTex(smoothTex);
+            if (sm != null)
+            {
+                MarkLinearMap(sm);
+                mat.SetTexture("_MetallicSpecGlossMap", sm);
+                mat.EnableKeyword("_METALLICSPECGLOSSMAP");
+                mat.SetFloat("_Smoothness", 1f); // масштаб — сама карта кодирует гладкость
+                mat.SetFloat("_Metallic", 0f);
+            }
+        }
 
         if (!string.IsNullOrEmpty(normalTex))
         {
@@ -69,6 +83,17 @@ public static class MaterialBuilder
         if (importer != null && importer.textureType != TextureImporterType.NormalMap)
         {
             importer.textureType = TextureImporterType.NormalMap;
+            importer.mipmapEnabled = true;
+            importer.SaveAndReimport();
+        }
+    }
+
+    private static void MarkLinearMap(Texture2D tex)
+    {
+        var importer = AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(tex)) as TextureImporter;
+        if (importer != null && importer.sRGBTexture)
+        {
+            importer.sRGBTexture = false; // данные гладкости — линейные
             importer.mipmapEnabled = true;
             importer.SaveAndReimport();
         }
