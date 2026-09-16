@@ -69,6 +69,13 @@ namespace Whitecoat.World
             return true;
         }
 
+        /// <summary>
+        /// Установка текущего реалма БЕЗ телепорта (для спавна):
+        /// игрок стартует в хабе, но поле current по умолчанию OpenSea.
+        /// Вызывается билдером сцены; без события (никто ещё не подписан).
+        /// </summary>
+        public void SetCurrentSilently(RealmId id) => current = id;
+
         public Vector3 CurrentSpawn() => Get(current)?.spawnPoint ?? Vector3.zero;
     }
 }

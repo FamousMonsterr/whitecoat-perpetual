@@ -183,6 +183,8 @@ public static class HubRealmBuilder
             new RealmManager.RealmEntry { id = RealmId.WarmCove,  titleKey = "realm.warmcove",  spawnPoint = new Vector3(CoveX, 0.6f, CoveZ + 8f), focus = null },
             new RealmManager.RealmEntry { id = RealmId.IceGardens,titleKey = "realm.icegardens",spawnPoint = new Vector3(GardenX, -4.5f, GardenZ + 34f), focus = null },
         };
+        // Игрок стартует в хабе — синхронизируем (иначе первый портал «море» игнорируется)
+        rm.SetCurrentSilently(RealmId.WarmCove);
 
         sys.AddComponent<PearlLedger>();
 
