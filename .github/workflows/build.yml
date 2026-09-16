@@ -321,8 +321,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
         run: |
-          TAG="v0.4.0"
-          TITLE="Белёк: Вечный Прибой v0.4.0 — Большой Мир (фундамент)"
+          # Тег берём из маркера коммита "[release vX.Y.Z]" — нельзя забыть поднять
+          TAG="$(echo "${{ github.event.head_commit.message }}" | grep -oE '\[release v[0-9]+\.[0-9]+\.[0-9]+\]' | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1)"
+          if [ -z "$TAG" ]; then TAG="v0.4.1"; fi
+          echo "Release tag: $TAG"
+          TITLE="Белёк: Вечный Прибой $TAG — Большой Мир"
           gh release view "$TAG" > /dev/null 2>&1 || \
           gh release create "$TAG" --title "$TITLE" --notes "Большой мир по мотивам петель SPYRO: хаб «Тёплая Бухта» + реалм «Ледяные Сады» на ассетах Fab. Смоке-тесты реального запуска пройдены (Windows D3D11 + macOS M1 Metal).
 
