@@ -279,6 +279,15 @@ jobs:
           cd "${{ github.workspace }}"
           ls -la WhitecoatPerpetual_macOS_AppleSilicon_signed.zip
 
+      - name: Upload signed macOS artifact (for release)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: WhitecoatPerpetual_macOS_AppleSilicon_signed
+          path: WhitecoatPerpetual_macOS_AppleSilicon_signed.zip
+          retention-days: 7
+          if-no-files-found: error
+
   release:
     name: Release Windows + macOS
     needs: [ build, build-macos, smoke-windows, smoke-macos ]
@@ -304,6 +313,7 @@ jobs:
           cd build/StandaloneWindows64
           zip -qr "${{ github.workspace }}/WhitecoatPerpetual_Win64.zip" .
           cd "${{ github.workspace }}"
+          mv signed/WhitecoatPerpetual_macOS_AppleSilicon_signed.zip .
           ls -la *.zip
 
       - name: Create GitHub Release
