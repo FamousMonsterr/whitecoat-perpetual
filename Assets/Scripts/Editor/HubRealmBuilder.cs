@@ -90,17 +90,15 @@ public static class HubRealmBuilder
             bip.transform.rotation = Quaternion.Euler(0f, 215f, 0f);
             FixFabRenderers(bip);
             var npc = bip.AddComponent<NpcFriend>();
-            npc.Configure("bip7", new[]
-            {
-                "БИП! Добро пожаловать домой, Белёк!",
-                "Данные собраны: жемчуг светится ярче твоей улыбки!",
-                "За восточной аркой шумит риф. Проверим?",
-                "Маяк стал ярче. Мои сенсоры довольны!",
-            });
+            npc.Configure("bip7", IntroSet.lines, IntroSet.clips);
+            var reactive = bip.AddComponent<Bip7Reactive>();
+            SetPrivate(reactive, "intro", IntroSet);
+            SetPrivate(reactive, "afterGems", GemsSet());
+            SetPrivate(reactive, "afterTraveler", TravSet());
+            SetPrivate(reactive, "afterShell", ShellSet());
             // Мягкий коллайдер, чтобы не проваливался
             var bc = bip.GetComponentInChildren<Collider>();
             if (bc == null) { var c = bip.AddComponent<BoxCollider>(); c.center = new Vector3(0f, 1f, 0f); c.size = new Vector3(1.4f, 2f, 1.4f); }
-            bip.AddComponent<Bip7Reactive>();
         }
 
         // Жемчужная дорожка «первый сбор» (старт в хабе — 10 сек до первой награды)
@@ -197,6 +195,65 @@ public static class HubRealmBuilder
             player.position = new Vector3(CoveX, 0.6f, CoveZ + 8f);
             Debug.Log($"[HubRealmBuilder] Player spawn moved to WarmCove: {player.position}");
         }
+    }
+
+    // ------------------------------------------------------- голосовые наборы БИП-7
+    private static Bip7Reactive.VoiceSet _introSet;
+
+    private static Bip7Reactive.VoiceSet IntroSet => _introSet ??= new Bip7Reactive.VoiceSet
+    {
+        lines = new[]
+        {
+            "БИП! Добро пожаловать домой, Белёк!",
+            "Данные собраны: жемчуг светится ярче твоей улыбки!",
+            "За восточной аркой шумит риф. Проверим?",
+            "Маяк стал ярче. Мои сенсоры довольны!",
+        },
+        clips = LoadVoiceClips("bip7_line", 4),
+    };
+
+    private static Bip7Reactive.VoiceSet GemsSet() => new Bip7Reactive.VoiceSet
+    {
+        lines = new[]
+        {
+            "БИП-отлично! Десять жемчужин уже в копилке!",
+            "За восточной аркой шумит риф. Проверим?",
+            "Волна к волне — и мы в Ледяных Садах!",
+        },
+        clips = LoadVoiceClips("bip7_gems", 3),
+    };
+
+    private static Bip7Reactive.VoiceSet TravSet() => new Bip7Reactive.VoiceSet
+    {
+        lines = new[]
+        {
+            "Ты вернулся домой путешественником. Данные обновлены!",
+            "Раковине нужно пятьдесят жемчужин, чтобы запеть. Плыви спокойно!",
+        },
+        clips = LoadVoiceClips("bip7_trav", 2),
+    };
+
+    private static Bip7Reactive.VoiceSet ShellSet() => new Bip7Reactive.VoiceSet
+    {
+        lines = new[]
+        {
+            "Раковина поёт! Мои микрофоны счастливые!",
+            "Маяк стал ярче. Мои сенсоры довольны!",
+            "БИП! Морю стало веселее, когда его друг вернулся домой.",
+        },
+        clips = LoadVoiceClips("bip7_shell", 3),
+    };
+
+    private static AudioClip[] LoadVoiceClips(string prefix, int count)
+    {
+        var list = new List<AudioClip>();
+        for (int i = 1; i <= count; i++)
+        {
+            var clip = AssetDatabase.LoadAssetAtPath<AudioClip>($"Assets/Audio/Voices/{prefix}{i:00}.wav");
+            if (clip == null) Debug.LogWarning($"[HubRealmBuilder] voice clip missing: {prefix}{i:00}");
+            list.Add(clip);
+        }
+        return list.ToArray();
     }
 
     // ------------------------------------------------------------------ утилиты

@@ -5,13 +5,14 @@ namespace Whitecoat.World
 {
     /// <summary>
     /// НПС-друг: автодиалог по близости (ни одной кнопки — доступно 5 годам),
-    /// реплика-вариации (никогда подряд одинаковые), событие для HUD-субтитров.
-    /// TTS-озвучка подключается в v0.5.0 (ключ VoiceCast — DesignDocs/02).
+    /// реплика-вариации (никогда подряд одинаковые), субтитры-лог + озвучка
+    /// Silero-клипами (голос персонажа постоянный — VoiceCast, DesignDocs/02 §7).
     /// </summary>
     public class NpcFriend : MonoBehaviour
     {
         [SerializeField] private string npcId = "bip7";
         [SerializeField] private string[] lines = { "БИП! Данные собраны!" };
+        [SerializeField] private AudioClip[] voiceClips; // параллельно lines (Tools/tts)
         [SerializeField] private float talkRadius = 4.5f;
         [SerializeField] private float repeatCooldown = 9f;
         [SerializeField] private Transform lookTarget; // голова НПС — куда смотреть камере (опц.)
@@ -23,11 +24,20 @@ namespace Whitecoat.World
 
         public event Action<string, string> OnSpoke; // (npcId, line)
 
-        /// <summary>Настройка из билдера (Editor): id + набор реплик.</summary>
-        public void Configure(string id, string[] dialogueLines)
+        /// <summary>Настройка из билдера (Editor): id + набор реплик (+ голоса).</summary>
+        public void Configure(string id, string[] dialogueLines, AudioClip[] voices = null)
         {
             npcId = id;
             lines = dialogueLines;
+            if (voices != null) voiceClips = voices;
+        }
+
+        /// <summary>Смена только реплик (реактивные НПС) — голоса сохраняются.</summary>
+        public void SetLines(string[] dialogueLines, AudioClip[] voices = null)
+        {
+            lines = dialogueLines;
+            if (voices != null) voiceClips = voices;
+            _lastLine = -1;
         }
 
         public string NpcId => npcId;
@@ -67,6 +77,13 @@ namespace Whitecoat.World
             _lastLine = idx;
             OnSpoke?.Invoke(npcId, lines[idx]);
             Debug.Log($"[NpcFriend] {npcId}: {lines[idx]}");
+
+            // Озвучка (Silero-клип: голос персонажа всегда один и тот же)
+            if (voiceClips != null && idx < voiceClips.Length && voiceClips[idx] != null
+                && Camera.main != null)
+            {
+                AudioSource.PlayClipAtPoint(voiceClips[idx], Camera.main.transform.position);
+            }
         }
     }
 }

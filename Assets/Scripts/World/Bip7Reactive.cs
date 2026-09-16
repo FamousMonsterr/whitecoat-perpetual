@@ -1,37 +1,26 @@
+using System;
 using UnityEngine;
 using Whitecoat.World;
 
 /// <summary>
-/// БИП-7 реагирует на прогресс квестов: наборы реплик меняются по состоянию
-/// журнала. Мир «помнит» достижения ребёнка — ключ удержания (DesignDocs/00 §4).
+/// БИП-7 реагирует на прогресс квестов: набор реплик (с озвучкой) меняется по
+/// состоянию журнала. Мир «помнит» достижения ребёнка — ключ удержания.
+/// VoiceSet'ы (реплики + Silero-клипы) назначает билдер сцены.
 /// </summary>
 public class Bip7Reactive : MonoBehaviour
 {
-    [SerializeField] private NpcFriend npc;
+    [Serializable]
+    public class VoiceSet
+    {
+        public string[] lines;
+        public AudioClip[] clips;
+    }
 
-    private readonly string[] _intro =
-    {
-        "БИП! Добро пожаловать домой, Белёк!",
-        "Данные собраны: жемчуг светится ярче твоей улыбки!",
-        "Собери десять жемчужин — и посмотрим, что скажут датчики!",
-    };
-    private readonly string[] _afterGems =
-    {
-        "БИП-отлично! Десять жемчужин уже в копилке!",
-        "За восточной аркой шумит риф. Проверим?",
-        "Волна к волне — и мы в Ледяных Садах!",
-    };
-    private readonly string[] _afterTraveler =
-    {
-        "Ты вернулся домой путешественником. Данные обновлены!",
-        "Раковине нужно пятьдесят жемчужин, чтобы запеть. Дорога длинная — плыви спокойно!",
-    };
-    private readonly string[] _afterShell =
-    {
-        "Раковина поёт! Мои микрофоны счастливые!",
-        "Маяк стал ярче. Мои сенсоры довольны!",
-        "БИП! Морю стало веселее, когда его друг вернулся домой.",
-    };
+    [SerializeField] private NpcFriend npc;
+    [SerializeField] private VoiceSet intro;
+    [SerializeField] private VoiceSet afterGems;
+    [SerializeField] private VoiceSet afterTraveler;
+    [SerializeField] private VoiceSet afterShell;
 
     private void Start()
     {
@@ -49,9 +38,13 @@ public class Bip7Reactive : MonoBehaviour
         if (npc == null || QuestJournal.Instance == null) return;
         var q = QuestJournal.Instance;
 
-        if (q.IsCompleted("q.singing_shell")) npc.Configure("bip7", _afterShell);
-        else if (q.IsCompleted("q.traveler")) npc.Configure("bip7", _afterTraveler);
-        else if (q.IsCompleted("q.first_gems")) npc.Configure("bip7", _afterGems);
-        else npc.Configure("bip7", _intro);
+        VoiceSet set =
+            q.IsCompleted("q.singing_shell") ? afterShell :
+            q.IsCompleted("q.traveler") ? afterTraveler :
+            q.IsCompleted("q.first_gems") ? afterGems :
+            intro;
+
+        if (set == null || set.lines == null || set.lines.Length == 0) return;
+        npc.SetLines(set.lines, set.clips);
     }
 }
