@@ -100,6 +100,7 @@ public static class HubRealmBuilder
             // Мягкий коллайдер, чтобы не проваливался
             var bc = bip.GetComponentInChildren<Collider>();
             if (bc == null) { var c = bip.AddComponent<BoxCollider>(); c.center = new Vector3(0f, 1f, 0f); c.size = new Vector3(1.4f, 2f, 1.4f); }
+            bip.AddComponent<Bip7Reactive>();
         }
 
         // Жемчужная дорожка «первый сбор» (старт в хабе — 10 сек до первой награды)
@@ -187,6 +188,8 @@ public static class HubRealmBuilder
         rm.SetCurrentSilently(RealmId.WarmCove);
 
         sys.AddComponent<PearlLedger>();
+        sys.AddComponent<QuestJournal>();
+        sys.AddComponent<WorldQuestBinder>();
 
         // Белёк стартует в Тёплой Бухте (хаб — точка входа Большого Мира)
         if (player != null)
