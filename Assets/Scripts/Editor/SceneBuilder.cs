@@ -382,11 +382,15 @@ public static class SceneBuilder
         var menuGo = new GameObject("Menus", typeof(Canvas));
         menuGo.AddComponent<MenuController>();
 
-        // 3. Сохранение сцены
+        // 3. Большой Мир: хаб Тёплая Бухта + реалмы (Fab-пакеты), старт в хабе
+        var playerGo = GameObject.Find("Player");
+        HubRealmBuilder.BuildInto(playerGo ? playerGo.transform : null);
+
+        // 4. Сохранение сцены
         Directory.CreateDirectory("Assets/Scenes");
         EditorSceneManager.SaveScene(scene, ScenePath);
 
-        // 4. Build Settings
+        // 5. Build Settings
         var buildScenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
         EditorBuildSettings.scenes = buildScenes;
 

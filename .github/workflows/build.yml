@@ -27,7 +27,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -58,7 +58,7 @@ jobs:
     name: Build Windows 64
     needs: test
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -111,7 +111,7 @@ jobs:
     name: Build macOS (Apple Silicon)
     needs: test
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -223,12 +223,17 @@ jobs:
           name: WhitecoatPerpetual_macOS
           path: build
 
-      - name: Prepare app (Gatekeeper off)
+      - name: Ad-hoc codesign (macOS)
+        # Ad-hoc подпись (identity "-"): без Apple Developer-аккаунта;
+        # снимает статус "damaged" у распакованных .app и честно
+        # подписывает бинарник для Gatekeeper — как в community-репо GameCI.
         run: |
           APP="$(find build -maxdepth 3 -name '*.app' -print -quit)"
           echo "APP=$APP" >> "$GITHUB_ENV"
           xattr -cr "$APP"
           chmod +x "$APP/Contents/MacOS/"*
+          codesign --force --deep --sign - "$APP"
+          codesign --verify --deep --strict "$APP" && echo "codesign: ad-hoc OK"
 
       - name: Launch player 100s + screenshot (real Metal on M1)
         run: |
@@ -265,6 +270,15 @@ jobs:
           retention-days: 7
           if-no-files-found: warn
 
+      - name: Repack signed macOS artifact (for release)
+        if: success()
+        run: |
+          # Переупаковка УЖЕ ПОДПИСАННОГО .app — release берёт этот артефакт
+          cd "$(dirname "$APP")"
+          zip -qry "${{ github.workspace }}/WhitecoatPerpetual_macOS_AppleSilicon_signed.zip" "$(basename "$APP")"
+          cd "${{ github.workspace }}"
+          ls -la WhitecoatPerpetual_macOS_AppleSilicon_signed.zip
+
   release:
     name: Release Windows + macOS
     needs: [ build, build-macos, smoke-windows, smoke-macos ]
@@ -279,18 +293,16 @@ jobs:
           name: WhitecoatPerpetual_Win64
           path: build/StandaloneWindows64/
 
-      - name: Download macOS Artifact
+      - name: Download signed macOS Artifact
         uses: actions/download-artifact@v4
         with:
-          name: WhitecoatPerpetual_macOS
-          path: build/StandaloneOSX/
+          name: WhitecoatPerpetual_macOS_AppleSilicon_signed
+          path: signed/
 
-      - name: Zip Builds
+      - name: Zip Windows Build
         run: |
           cd build/StandaloneWindows64
           zip -qr "${{ github.workspace }}/WhitecoatPerpetual_Win64.zip" .
-          cd "${{ github.workspace }}/build/StandaloneOSX"
-          zip -qry "${{ github.workspace }}/WhitecoatPerpetual_macOS_AppleSilicon.zip" .
           cd "${{ github.workspace }}"
           ls -la *.zip
 
@@ -299,29 +311,28 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
         run: |
-          TAG="v0.3.1"
-          TITLE="Белёк: Вечный Прибой — Windows 64 + macOS (Apple Silicon)"
+          TAG="v0.4.0"
+          TITLE="Белёк: Вечный Прибой v0.4.0 — Большой Мир (фундамент)"
           gh release view "$TAG" > /dev/null 2>&1 || \
-          gh release create "$TAG" --title "$TITLE" --notes "Играбельные сборки (64-bit). Реальные смоук-тесты запуска пройдены (windows-latest D3D11 + macos-14 M1 Metal).
+          gh release create "$TAG" --title "$TITLE" --notes "Большой мир по мотивам петель SPYRO: хаб «Тёплая Бухта» + реалм «Ледяные Сады» на ассетах Fab. Смоке-тесты реального запуска пройдены (Windows D3D11 + macOS M1 Metal).
 
           **Windows:** распакуйте WhitecoatPerpetual_Win64.zip и запустите WhitecoatPerpetual.exe.
-          **macOS (Apple Silicon):** распакуйте WhitecoatPerpetual_macOS_AppleSilicon.zip и запустите WhitecoatPerpetual.app.
-          Сборка не подписана: первый запуск через правый клик → «Открыть» (или \`xattr -cr WhitecoatPerpetual.app\`).
+          **macOS (Apple Silicon):** распакуйте WhitecoatPerpetual_macOS_AppleSilicon_signed.zip и запустите WhitecoatPerpetual.app — сборка подписана ad-hoc; если Gatekeeper всё же спросит: правый клик → «Открыть».
 
-          Управление: WASD — плавание, Shift — ускорение, Space — всплытие/прыжок,
-          Ctrl — нырок, E — взаимодействие.
+          Управление: WASD — плавание, Shift — ускорение, Space — прыжок/рывок,
+          Q/E — нырок/всплытие, F — фыркнуть (поговорить с другом).
 
-          **v0.3.1 — фикс розового экрана/зависания на старых GPU (Radeon RX Vega 56 и т.п.):**
-          - Graphics Jobs отключены (известные зависания драйвера Vega/Polaris при gfx-jobs=1);
-          - графический API закреплён: Direct3D11 (Windows) / Metal (macOS);
-          - URP-шейдеры добавлены в Always Included Shaders, URP-ассет — во все уровни качества;
-          - при первом запуске возможна пауза 30–90 сек (компиляция шейдеров) — это нормально.
-          Если экран всё ещё розовый — обновите драйвер AMD Adrenalin и запустите с параметром \`-force-d3d11\`.
+          **Новое в v0.4.0:**
+          - Старт игры в хабе «Тёплая Бухта»: маяк (реагирует на жемчуг), арки-порталы, БИП-7;
+          - Реалм «Ледяные Сады»: коралловый риф Fab, жемчужные дорожки, Поющая Раковина;
+          - Жемчуг + серии сбора, автосохранение счёта;
+          - 9 пакетов Fab интегрированы, материалы переведены в URP, текстуры оптимизированы;
+          - macOS: ad-hoc codesign при сборке.
 
           Сборка: Unity 6000.5.0f1 (URP 17.5), StandaloneWindows64 + StandaloneOSX (ARM64).
           Коммит: ${{ github.sha }}" || true
           gh release view "$TAG" > /dev/null 2>&1 || gh release create "$TAG" --generate-notes || true
           gh release upload "$TAG" \
             "WhitecoatPerpetual_Win64.zip" \
-            "WhitecoatPerpetual_macOS_AppleSilicon.zip" --clobber
+            "WhitecoatPerpetual_macOS_AppleSilicon_signed.zip" --clobber
           echo "Release ready: https://github.com/${{ github.repository }}/releases/tag/$TAG"

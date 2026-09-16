@@ -48,6 +48,7 @@ public static class BuildValidator
             : "build/StandaloneWindows64/WhitecoatPerpetual.exe";
 
         // 1. Программная пересборка сцены (детерминированная)
+        FabMaterialFixer.FixAll();          // Fab-пакеты → URP-материалы/импорты (idempotent)
         SceneBuilder.EnsureBuilt(force: true);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
